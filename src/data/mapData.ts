@@ -1,4 +1,5 @@
 import { MapMarker } from '../types/disaster';
+import { Language } from '../types/language';
 
 export interface BmkgEarthquakeData {
   tanggal: string;
@@ -564,4 +565,21 @@ export const INDONESIA_MAP_MARKERS: MapMarker[] = [
     details: 'Dipantau pos PVMBG Ternate 24 jam nonstop.'
   }
 ];
+
+export const getMapMarkers = (lang: Language = 'id'): MapMarker[] => {
+  if (lang === 'id') return INDONESIA_MAP_MARKERS;
+  
+  return INDONESIA_MAP_MARKERS.map(m => {
+    let riskLevel = m.riskLevel;
+    if (m.riskLevel === 'Ekstrem') riskLevel = 'Ekstrem';
+    else if (m.riskLevel === 'Sangat Tinggi') riskLevel = 'Sangat Tinggi';
+    else if (m.riskLevel === 'Tinggi') riskLevel = 'Tinggi';
+
+    return {
+      ...m,
+      riskLevel
+    };
+  });
+};
+
 

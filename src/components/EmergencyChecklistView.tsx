@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { 
   PackageCheck, 
-  Info, 
   Scale, 
   Clock, 
   MapPin, 
@@ -17,18 +16,8 @@ import {
   Shield, 
   Radio, 
   Wrench,
-  Sparkles,
-  AlertTriangle,
-  HeartHandshake,
-  Baby,
-  Users,
   ShieldCheck,
-  CalendarCheck,
-  Luggage,
-  HelpCircle,
-  RotateCcw,
-  CheckCircle2,
-  Heart
+  Luggage
 } from 'lucide-react';
 import { getChecklistItems } from '../data/checklistData';
 import { soundEngine } from '../audio/soundEngine';
@@ -41,12 +30,6 @@ interface EmergencyChecklistViewProps {
 export const EmergencyChecklistView: React.FC<EmergencyChecklistViewProps> = () => {
   const { language, t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-  const [checkedIds, setCheckedIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('dv3d_checklist_ids');
-    return saved ? JSON.parse(saved) : ['tsb_water', 'tsb_food', 'tsb_p3k', 'tsb_flashlight'];
-  });
-
-  const items = getChecklistItems(language);
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -62,64 +45,55 @@ export const EmergencyChecklistView: React.FC<EmergencyChecklistViewProps> = () 
       case 'Shield': return <Shield className="w-5 h-5 text-violet-400" />;
       case 'Radio': return <Radio className="w-5 h-5 text-orange-400" />;
       case 'Wrench': return <Wrench className="w-5 h-5 text-slate-300" />;
-      case 'Heart': return <Heart className="w-5 h-5 text-pink-400" />;
       default: return <PackageCheck className="w-5 h-5 text-cyan-400" />;
     }
   };
 
-  const categories = [
-    { id: 'ALL', label: t('checklist.filterAll') },
-    { id: 'Kebutuhan Pokok', label: t('checklist.catBasic') },
-    { id: 'Pertolongan & Medis', label: t('checklist.catMedical') },
-    { id: 'Komunikasi & Penerangan', label: t('checklist.catComms') },
-    { id: 'Dokumen & Perlindungan', label: t('checklist.catDocs') }
+  const rawCategories = [
+    { id: 'ALL', label: t.checkCatAll },
+    { id: 'Kebutuhan Pokok', label: t.checkCatBasic },
+    { id: 'Pertolongan & Medis', label: t.checkCatMedical },
+    { id: 'Komunikasi & Penerangan', label: t.checkCatComm },
+    { id: 'Dokumen & Perlindungan', label: t.checkCatDocs }
   ];
+
+  const items = getChecklistItems(language);
 
   const filteredItems = selectedCategory === 'ALL'
     ? items
     : items.filter(it => it.category === selectedCategory);
 
-  const toggleItem = (id: string) => {
-    soundEngine.playClick();
-    setCheckedIds(prev => {
-      const next = prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id];
-      localStorage.setItem('dv3d_checklist_ids', JSON.stringify(next));
-      return next;
-    });
-  };
-
-  const resetChecklist = () => {
-    soundEngine.playClick();
-    setCheckedIds([]);
-    localStorage.removeItem('dv3d_checklist_ids');
-  };
-
-  const totalCheckedWeight = items
-    .filter(it => checkedIds.includes(it.id))
-    .reduce((sum, it) => sum + it.weightKg, 0);
-
-  const completionRate = Math.round((checkedIds.length / items.length) * 100);
-
   const getImportanceBadge = (importance: string) => {
-    if (importance === 'Sangat Wajib') {
-      return (
-        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-          {t('checklist.mustHave')}
-        </span>
-      );
-    } else if (importance === 'Penting') {
-      return (
-        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
-          {t('checklist.important')}
-        </span>
-      );
-    } else {
-      return (
-        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
-          {t('checklist.supplementary')}
-        </span>
-      );
+    switch (importance) {
+      case 'Sangat Wajib':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+            {t.checkImportanceHigh}
+          </span>
+        );
+      case 'Penting':
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+            {t.checkImportanceMedium}
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+            {t.checkImportanceLow}
+          </span>
+        );
+    }
+  };
+
+  const getCategoryLabel = (cat: string) => {
+    switch (cat) {
+      case 'Kebutuhan Pokok': return t.checkCatBasic;
+      case 'Pertolongan & Medis': return t.checkCatMedical;
+      case 'Komunikasi & Penerangan': return t.checkCatComm;
+      case 'Dokumen & Perlindungan': return t.checkCatDocs;
+      default: return cat;
     }
   };
 
@@ -129,142 +103,168 @@ export const EmergencyChecklistView: React.FC<EmergencyChecklistViewProps> = () 
       <div className="mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-3">
           <ShieldCheck className="w-3.5 h-3.5" />
-          <span>{language === 'en' ? 'BNPB INDONESIA DISASTER PREPAREDNESS STANDARD' : 'STANDAR MITIGASI KESIAPSIAGAAN BNPB INDONESIA'}</span>
+          <span>{language === 'en' ? 'BNPB INDONESIA DISASTER MITIGATION PREPAREDNESS STANDARD' : 'STANDAR MITIGASI KESIAPSIAGAAN BNPB INDONESIA'}</span>
         </div>
-        <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-          {t('checklist.title')}
-        </h1>
-        <p className="text-sm sm:text-base text-zinc-400 mt-2 max-w-3xl leading-relaxed">
-          {t('checklist.subtitle')}
+        <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">{t.checkHeaderTitle}</h1>
+        <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl">
+          {t.checkHeaderSubtitle}
         </p>
       </div>
 
-      {/* Progress & Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* Progress Bar Card */}
-        <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-zinc-400">{t('checklist.readyProgress')}</span>
-            <span className="text-sm font-black text-emerald-400">{completionRate}%</span>
+      {/* 4 Core Standard Principles Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="p-5 rounded-3xl bg-zinc-950/80 border border-zinc-800 backdrop-blur-xl flex flex-col justify-between">
+          <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-3">
+            <Clock className="w-5 h-5" />
           </div>
-          <div className="w-full bg-zinc-950 h-3 rounded-full overflow-hidden border border-zinc-800">
-            <div 
-              className="h-full bg-gradient-to-r from-emerald-500 to-cyan-400 transition-all duration-500 rounded-full"
-              style={{ width: `${completionRate}%` }}
-            />
-          </div>
-          <div className="text-[11px] text-zinc-400 mt-2">
-            {checkedIds.length} {t('checklist.of')} {items.length} {t('checklist.itemsPacked')}
-          </div>
-        </div>
-
-        {/* Total Weight Estimate */}
-        <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <span className="text-xs font-bold text-zinc-400">{t('checklist.totalWeight')}</span>
-            <div className="text-2xl font-black text-white mt-1">
-              {totalCheckedWeight.toFixed(1)} <span className="text-sm font-normal text-zinc-400">kg</span>
+            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">
+              {language === 'en' ? 'Survival Principle' : 'Prinsip Bertahan'}
             </div>
-            <p className="text-[11px] text-zinc-400 mt-0.5">
-              {language === 'en' ? 'Ideal max weight for adults: ≤ 10-12 kg' : 'Batas ideal tas evakuasi dewasa: ≤ 10-12 kg'}
+            <h4 className="text-sm font-bold text-amber-300 mb-1">
+              {language === 'en' ? '72-Hour Golden Period' : '72 Jam Golden Period'}
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {language === 'en' 
+                ? 'Sustains individual nutrition, hydration, and first aid before emergency relief networks deploy.' 
+                : 'Memenuhi nutrisi, hidrasi, dan medis mandiri sebelum posko penampungan darurat beroperasi penuh.'}
             </p>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
-            <Scale className="w-6 h-6" />
-          </div>
         </div>
 
-        {/* Reset / Actions Card */}
-        <div className="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl flex items-center justify-between">
+        <div className="p-5 rounded-3xl bg-zinc-950/80 border border-zinc-800 backdrop-blur-xl flex flex-col justify-between">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-3">
+            <Scale className="w-5 h-5" />
+          </div>
           <div>
-            <span className="text-xs font-bold text-zinc-400">{t('checklist.itemsPacked')}</span>
-            <div className="text-sm font-bold text-white mt-1">
-              {completionRate === 100 ? (
-                <span className="text-emerald-400 font-extrabold flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" /> {t('checklist.readyBadge')}
-                </span>
-              ) : (
-                <span>{items.length - checkedIds.length} {language === 'en' ? 'items remaining' : 'barang belum siap'}</span>
-              )}
+            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">
+              {language === 'en' ? 'Weight Capacity' : 'Kapasitas Beban'}
             </div>
+            <h4 className="text-sm font-bold text-emerald-300 mb-1">
+              {language === 'en' ? '15 - 20% Body Weight' : '15 - 20% Bobot Tubuh'}
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {language === 'en'
+                ? 'Packs must not exceed mobility thresholds so individuals can sprint, crouch, and move quickly.'
+                : 'Ransel tidak boleh terlalu berat agar pengguna tetap dapat berlari, merunduk, dan bergerak lincah.'}
+            </p>
           </div>
-          <button
-            onClick={resetChecklist}
-            className="px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-bold border border-zinc-700 flex items-center gap-1.5 transition-all"
-            title={t('checklist.resetAll')}
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>{t('checklist.resetAll')}</span>
-          </button>
+        </div>
+
+        <div className="p-5 rounded-3xl bg-zinc-950/80 border border-zinc-800 backdrop-blur-xl flex flex-col justify-between">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-3">
+            <MapPin className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">
+              {language === 'en' ? 'Placement Location' : 'Titik Penempatan'}
+            </div>
+            <h4 className="text-sm font-bold text-emerald-300 mb-1">
+              {language === 'en' ? 'Near Exit Door' : 'Dekat Pintu Keluar'}
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {language === 'en'
+                ? 'Store in an unobstructed area easily accessible to family members during acute evacuation.'
+                : 'Diletakkan di area yang mudah dijangkau seluruh keluarga tanpa terhalang pintu atau lemari saat gempa.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="p-5 rounded-3xl bg-zinc-950/80 border border-zinc-800 backdrop-blur-xl flex flex-col justify-between">
+          <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 mb-3">
+            <Luggage className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-0.5">
+              {language === 'en' ? 'Pack Specifications' : 'Spesifikasi Tas'}
+            </div>
+            <h4 className="text-sm font-bold text-purple-300 mb-1">
+              {language === 'en' ? 'Waterproof & High-Vis' : 'Ransel Tahan Air & Terang'}
+            </h4>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              {language === 'en'
+                ? 'Opt for reflective, waterproof ripstop backpacks (dry-bags) to keep survival contents dry and visible.'
+                : 'Gunakan tas ransel bergaris reflektor dan berbahan kedap air (waterproof / dry-bag) agar isi tetap kering.'}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Category Filter Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-3 mb-6">
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => {
-              soundEngine.playClick();
-              setSelectedCategory(cat.id);
-            }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
-              selectedCategory === cat.id
-                ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm'
-                : 'bg-zinc-900 text-zinc-400 border-zinc-800 hover:text-white hover:bg-zinc-800'
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
+      {/* Category Filter Tabs */}
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-white">
+            {language === 'en' ? 'Essential Supply Checklist' : 'Daftar Barang & Kebutuhan Esensial'}
+          </h2>
+          <p className="text-xs text-slate-400">
+            {language === 'en' ? 'Itemized specifications and functional breakdown' : 'Rincian spesifikasi dan fungsi barang perlengkapan evakuasi'}
+          </p>
+        </div>
 
-      {/* Checklist Items Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-        {filteredItems.map((item) => {
-          const isChecked = checkedIds.includes(item.id);
-          return (
-            <div
-              key={item.id}
-              onClick={() => toggleItem(item.id)}
-              className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-start gap-3.5 select-none ${
-                isChecked
-                  ? 'bg-emerald-950/20 border-emerald-500/50 shadow-sm'
-                  : 'bg-zinc-900 border-zinc-800/80 hover:border-zinc-700'
+        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
+          {rawCategories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => {
+                soundEngine.playClick();
+                setSelectedCategory(cat.id);
+              }}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                selectedCategory === cat.id
+                  ? 'bg-emerald-600 text-white border border-emerald-500 shadow-sm'
+                  : 'bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-800'
               }`}
             >
-              {/* Checkbox box */}
-              <div className={`w-6 h-6 rounded-lg border mt-0.5 flex items-center justify-center shrink-0 transition-colors ${
-                isChecked
-                  ? 'bg-emerald-600 border-emerald-500 text-white'
-                  : 'bg-zinc-950 border-zinc-700 text-transparent'
-              }`}>
-                <CheckCircle2 className="w-4 h-4 fill-white text-emerald-600" />
-              </div>
+              {cat.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-              {/* Icon Container */}
-              <div className="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center shrink-0">
-                {getIcon(item.icon)}
-              </div>
+      {/* Informative Items Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+        {filteredItems.map((item) => (
+          <div
+            key={item.id}
+            className="p-5 rounded-3xl bg-zinc-950/70 border border-zinc-800 hover:border-zinc-700 transition-all duration-200 flex flex-col justify-between group backdrop-blur-xl hover:-translate-y-0.5 shadow-lg"
+          >
+            <div>
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center transition-transform group-hover:scale-105 shrink-0">
+                    {getIcon(item.icon)}
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                      {getCategoryLabel(item.category)}
+                    </span>
+                    <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">
+                      {item.name}
+                    </h4>
+                  </div>
+                </div>
 
-              {/* Content */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <h4 className={`text-sm font-bold truncate ${isChecked ? 'text-emerald-300' : 'text-white'}`}>
-                    {item.name}
-                  </h4>
+                <div className="shrink-0">
                   {getImportanceBadge(item.importance)}
                 </div>
-                <p className="text-xs text-zinc-400 leading-relaxed line-clamp-2">
-                  {item.description}
-                </p>
-                <div className="text-[10px] text-zinc-400 mt-2 font-mono">
-                  {language === 'en' ? 'Est. weight:' : 'Est. berat:'} <span className="text-zinc-200 font-bold">{item.weightKg} kg</span>
-                </div>
               </div>
+
+              <p className="text-xs text-slate-300/90 leading-relaxed mb-4">
+                {item.description}
+              </p>
             </div>
-          );
-        })}
+
+            <div className="pt-3 border-t border-zinc-800/80 flex items-center justify-between text-[11px] text-slate-400">
+              <span className="flex items-center gap-1.5">
+                <Scale className="w-3.5 h-3.5 text-zinc-500" />
+                {language === 'en' ? `Est. Weight: ~${item.weightKg} kg` : `Estimasi: ~${item.weightKg} kg`}
+              </span>
+              <span className="text-emerald-400 font-mono text-[10px]">
+                {language === 'en' ? 'BNPB 72H STANDARD' : 'STANDAR 72H BNPB'}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

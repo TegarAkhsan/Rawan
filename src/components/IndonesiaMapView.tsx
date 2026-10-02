@@ -4,21 +4,13 @@ import {
   Flame, 
   Activity, 
   Waves, 
-  Info, 
   Radio, 
-  Globe, 
-  Zap, 
-  Layers, 
   Search, 
-  ArrowRight, 
-  ShieldAlert, 
-  ExternalLink, 
-  Compass, 
-  X 
+  X
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { INDONESIA_MAP_MARKERS } from '../data/mapData';
+import { getMapMarkers } from '../data/mapData';
 import { MapMarker } from '../types/disaster';
 import { soundEngine } from '../audio/soundEngine';
 import { useLanguage } from '../context/LanguageContext';
@@ -27,15 +19,17 @@ interface IndonesiaMapViewProps {
   onNavigate?: (view: any) => void;
 }
 
-// Tile layers definitions
+// Tile layers definitions for Google Maps view
 const TILE_LAYERS = {
   google_satellite: {
-    name: 'Satelit Google Maps',
+    name_id: 'Satelit Google Maps',
+    name_en: 'Google Maps Satellite',
     url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
     attribution: '&copy; Google Maps Satellite Data'
   },
   google_terrain: {
-    name: 'Google Maps Peta Jalan',
+    name_id: 'Google Maps Peta Jalan',
+    name_en: 'Google Maps Street Map',
     url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
     attribution: '&copy; Google Maps'
   }
@@ -105,7 +99,8 @@ const createCustomIcon = (type: string, isSelected: boolean) => {
 
 export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
   const { language, t } = useLanguage();
-  const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(INDONESIA_MAP_MARKERS[0]);
+  const staticMarkers = getMapMarkers(language);
+  const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(staticMarkers[0]);
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'earthquake' | 'volcano' | 'subduction' | 'fault'>('ALL');
   const [selectedTileStyle, setSelectedTileStyle] = useState<keyof typeof TILE_LAYERS>('google_satellite');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -199,6 +194,14 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
             const lng = parseFloat(rawCoords[1]) || 0;
 
             const isEn = language === 'en';
+            const desc = isEn 
+              ? `Epicenter depth ${g.Kedalaman}. ${g.Potensi}`
+              : `Pusat gempa kedalaman ${g.Kedalaman}. ${g.Potensi}`;
+            
+            const details = isEn
+              ? `Official automated BMKG TEWS data: Event time ${g.Tanggal} ${g.Jam} WIB. Location: ${g.Lintang} - ${g.Bujur}, Depth: ${g.Kedalaman}. Felt intensity: ${g.Dirasakan || 'Under seismic instrument evaluation'}.`
+              : `Data resmi otomatis BMKG TEWS: Waktu gempa ${g.Tanggal} ${g.Jam} WIB. Lokasi: ${g.Lintang} - ${g.Bujur}, Kedalaman: ${g.Kedalaman}. Dirasakan: ${g.Dirasakan || 'Dalam evaluasi instrumen seismograf'}.`;
+
             return {
               id: `bmkg_live_${i}`,
               title: isEn ? `Earthquake M ${g.Magnitude} - ${g.Wilayah}` : `Gempa M ${g.Magnitude} - ${g.Wilayah}`,
@@ -206,17 +209,9 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
               location: `${g.Wilayah} (${g.Tanggal} ${g.Jam})`,
               lat,
               lng,
-              description: isEn 
-                ? `Epicenter depth: ${g.Kedalaman}. ${g.Potensi}` 
-                : `Pusat gempa kedalaman ${g.Kedalaman}. ${g.Potensi}`,
-              riskLevel: parseFloat(g.Magnitude) >= 6.0 
-                ? (isEn ? 'Ekstrem' : 'Ekstrem') 
-                : parseFloat(g.Magnitude) >= 5.0 
-                  ? (isEn ? 'Tinggi' : 'Tinggi') 
-                  : (isEn ? 'Waspada' : 'Waspada'),
-              details: isEn
-                ? `BMKG TEWS Official Telemetry: Time: ${g.Tanggal} ${g.Jam} WIB. Coordinates: ${g.Lintang} - ${g.Bujur}, Depth: ${g.Kedalaman}. Felt scale: ${g.Dirasakan || 'Seismograph instrumental assessment'}.`
-                : `Data resmi otomatis BMKG TEWS: Waktu gempa ${g.Tanggal} ${g.Jam} WIB. Lokasi: ${g.Lintang} - ${g.Bujur}, Kedalaman: ${g.Kedalaman}. Dirasakan: ${g.Dirasakan || 'Dalam evaluasi instrumen seismograf'}.`
+              description: desc,
+              riskLevel: parseFloat(g.Magnitude) >= 6.0 ? 'Ekstrem' : parseFloat(g.Magnitude) >= 5.0 ? 'Tinggi' : 'Waspada',
+              details: details
             };
           });
 
@@ -225,7 +220,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
           setLastBmkgSync(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
         }
       } catch (err) {
-        console.warn('Live BMKG fetch fallback active', err);
+        console.warn('Gagal memuat API Live BMKG, beralih ke data seismik katalog terintegrasi.', err);
       }
     };
 
@@ -234,7 +229,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
     return () => clearInterval(timer);
   }, [language]);
 
-  const allCombinedMarkers = [...bmkgLiveMarkers, ...INDONESIA_MAP_MARKERS];
+  const allCombinedMarkers = [...bmkgLiveMarkers, ...staticMarkers];
 
   const filteredMarkers = allCombinedMarkers.filter(m => {
     const matchesCategory = activeFilter === 'ALL' ? true : m.type === activeFilter;
@@ -256,6 +251,16 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
     }
   };
 
+  const getRiskBadgeText = (risk: string) => {
+    if (language === 'en') {
+      if (risk === 'Ekstrem') return t.mapRiskExtreme;
+      if (risk === 'Sangat Tinggi') return t.mapRiskVeryHigh;
+      if (risk === 'Tinggi') return t.mapRiskHigh;
+      return 'Advisory';
+    }
+    return risk;
+  };
+
   return (
     <section className="relative z-20 w-full h-[100dvh] pt-16 sm:pt-20 pb-2.5 px-3 sm:px-6 flex flex-col justify-between overflow-hidden animate-in fade-in duration-300">
       
@@ -263,12 +268,12 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
       <div className="mb-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           <h1 className="text-lg sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
-            <span>{t('map.title')}</span>
+            <span>{t.mapHeaderTitle}</span>
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
           </h1>
           <span className="text-zinc-600 hidden sm:inline">|</span>
           <span className="text-xs text-zinc-400 hidden md:inline">
-            {t('map.subtitle')}
+            {t.mapHeaderSubtitle}
           </span>
         </div>
 
@@ -276,7 +281,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
         {lastBmkgSync && (
           <div className="px-3 py-1 rounded-xl bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-300 font-mono flex items-center gap-2 self-start sm:self-auto shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>Sync BMKG: <strong className="text-white">{lastBmkgSync} WIB</strong></span>
+            <span>{language === 'en' ? 'BMKG Telemetry Sync:' : 'Sync BMKG:'} <strong className="text-white">{lastBmkgSync} WIB</strong></span>
           </div>
         )}
       </div>
@@ -290,11 +295,11 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
           {/* Disaster Type Filter Tabs */}
           <div className="flex items-center overflow-x-auto custom-scrollbar gap-1.5 pb-1 lg:pb-0">
             {[
-              { id: 'ALL', label: t('map.filterAll') },
-              { id: 'earthquake', label: `Live BMKG (${bmkgLiveMarkers.length})`, icon: <Radio className="w-3.5 h-3.5 text-emerald-400" /> },
-              { id: 'volcano', label: `${language === 'en' ? 'Volcanoes' : 'Gunung Api'} (${volcanoCount})`, icon: <Flame className="w-3.5 h-3.5 text-rose-400" /> },
-              { id: 'subduction', label: t('map.filterSubduction'), icon: <Waves className="w-3.5 h-3.5 text-blue-400" /> },
-              { id: 'fault', label: t('map.filterFaults'), icon: <Activity className="w-3.5 h-3.5 text-amber-400" /> }
+              { id: 'ALL', label: t.mapFilterAll },
+              { id: 'earthquake', label: `${t.mapFilterLiveBmkg} (${bmkgLiveMarkers.length})`, icon: <Radio className="w-3.5 h-3.5 text-emerald-400" /> },
+              { id: 'volcano', label: `${t.mapFilterVolcano} (${volcanoCount})`, icon: <Flame className="w-3.5 h-3.5 text-rose-400" /> },
+              { id: 'subduction', label: t.mapFilterSubduction, icon: <Waves className="w-3.5 h-3.5 text-blue-400" /> },
+              { id: 'fault', label: t.mapFilterFault, icon: <Activity className="w-3.5 h-3.5 text-amber-400" /> }
             ].map((f) => (
               <button
                 key={f.id}
@@ -323,74 +328,65 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={language === 'en' ? 'Search fault, volcano, city...' : 'Cari lokasi, sesar, gunung...'}
+                placeholder={language === 'en' ? "Search location, volcano..." : "Cari lokasi, gunung..."}
                 className="w-full bg-zinc-950 border border-zinc-700 rounded-xl pl-8 pr-3 py-1 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-emerald-500 transition-colors"
               />
             </div>
 
             {/* Map Style Switcher */}
-            <div className="flex bg-zinc-950 p-0.5 rounded-xl border border-zinc-700 shrink-0">
-              <button
-                onClick={() => {
-                  soundEngine.playClick();
-                  setSelectedTileStyle('google_satellite');
-                }}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                  selectedTileStyle === 'google_satellite' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                {language === 'en' ? 'Satellite' : 'Satelit'}
-              </button>
-              <button
-                onClick={() => {
-                  soundEngine.playClick();
-                  setSelectedTileStyle('google_terrain');
-                }}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                  selectedTileStyle === 'google_terrain' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
-                }`}
-              >
-                {language === 'en' ? 'Street Map' : 'Peta Jalan'}
-              </button>
+            <div className="flex items-center bg-zinc-950 border border-zinc-800 rounded-xl p-0.5">
+              {(Object.keys(TILE_LAYERS) as Array<keyof typeof TILE_LAYERS>).map((layerKey) => (
+                <button
+                  key={layerKey}
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setSelectedTileStyle(layerKey);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all ${
+                    selectedTileStyle === layerKey
+                      ? 'bg-zinc-800 text-emerald-400 shadow-sm'
+                      : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  {language === 'en' ? (layerKey === 'google_satellite' ? 'Satellite' : 'Roadmap') : (layerKey === 'google_satellite' ? 'Satelit' : 'Peta')}
+                </button>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Map Viewport Area with Detail Floating Card */}
-        <div className="relative flex-1 w-full min-h-0 bg-black">
-          
-          {/* Leaflet Map React Container */}
+        {/* Leaflet Map Interactive Viewport */}
+        <div className="flex-1 w-full h-full relative min-h-0">
           <MapContainer
             center={[-2.5, 118.0]}
             zoom={5}
             minZoom={4}
-            maxZoom={14}
-            className="w-full h-full z-0"
-            zoomControl={true}
+            maxZoom={12}
+            scrollWheelZoom={true}
+            className="w-full h-full z-0 bg-[#060d17]"
           >
-            {/* Auto Recenter to selected marker */}
+            <TileLayer
+              attribution={TILE_LAYERS[selectedTileStyle].attribution}
+              url={TILE_LAYERS[selectedTileStyle].url}
+              subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+              maxZoom={20}
+            />
+
+            {/* Recenter Viewport Controller */}
             {selectedMarker && (
               <MapRecenter lat={selectedMarker.lat} lng={selectedMarker.lng} />
             )}
 
-            {/* Base Tile Layer */}
-            <TileLayer
-              url={TILE_LAYERS[selectedTileStyle].url}
-              attribution={TILE_LAYERS[selectedTileStyle].attribution}
-              maxZoom={20}
-              subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
-            />
-
-            {/* 1. SUNDA MEGATHRUST & TIMOR TRENCH POLYLINE (BLUE/CYAN) */}
+            {/* 1. TECTONIC SUBDUCTION / MEGATHRUST TRENCH LINES (CYAN/BLUE) */}
             {(activeFilter === 'ALL' || activeFilter === 'subduction') && (
               <>
                 <Polyline 
                   positions={sundaMegathrustCoords}
-                  pathOptions={{
-                    color: '#38bdf8',
-                    weight: 3.5,
+                  pathOptions={{ 
+                    color: '#06b6d4', 
+                    weight: 3.5, 
                     dashArray: '8, 8',
-                    opacity: 0.85
+                    opacity: 0.85 
                   }}
                 />
                 <Polyline 
@@ -467,7 +463,13 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
                   </div>
                   <div>
                     <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-400 block">
-                      {selectedMarker.type === 'earthquake' ? 'Live BMKG' : selectedMarker.type === 'volcano' ? (language === 'en' ? 'Active Volcano' : 'Gunung Api Aktif') : selectedMarker.type === 'subduction' ? 'Megathrust' : (language === 'en' ? 'Active Fault' : 'Sesar Aktif')}
+                      {selectedMarker.type === 'earthquake' 
+                        ? (language === 'en' ? 'Live BMKG Earthquake' : 'Live Gempa BMKG')
+                        : selectedMarker.type === 'volcano' 
+                        ? (language === 'en' ? 'Active Volcano' : 'Gunung Api Aktif')
+                        : selectedMarker.type === 'subduction' 
+                        ? (language === 'en' ? 'Megathrust Subduction' : 'Zona Megathrust')
+                        : (language === 'en' ? 'Active Onshore Fault' : 'Sesar Patahan Aktif')}
                     </span>
                     <h4 className="text-sm sm:text-base font-black text-white leading-tight">
                       {selectedMarker.title}
@@ -482,12 +484,12 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
                     selectedMarker.riskLevel === 'Tinggi' ? 'bg-amber-950 text-amber-200 border-amber-600' :
                     'bg-emerald-950 text-emerald-200 border-emerald-600'
                   }`}>
-                    {selectedMarker.riskLevel}
+                    {getRiskBadgeText(selectedMarker.riskLevel)}
                   </span>
                   <button
                     onClick={() => setSelectedMarker(null)}
                     className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-                    title={t('detailModal.btnClose')}
+                    title={language === 'en' ? "Close Details" : "Tutup Detail"}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -500,7 +502,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
 
               <div className="text-[11px] text-zinc-400 space-y-1 border-t border-zinc-800 pt-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-zinc-500">{t('map.coordinates')}:</span>
+                  <span className="text-zinc-500">{language === 'en' ? 'Geographic Coordinates:' : 'Koordinat Geografis:'}</span>
                   <span className="font-mono text-emerald-300 font-bold">{selectedMarker.lat.toFixed(2)}°, {selectedMarker.lng.toFixed(2)}°</span>
                 </div>
                 <div className="flex items-start justify-between gap-2">
@@ -518,20 +520,18 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
 
           {/* Quick Legend Overlay Box (Bottom Left) */}
           <div className="hidden sm:flex absolute bottom-4 left-4 z-[1000] bg-zinc-950/90 border border-zinc-800 rounded-xl px-3 py-2 shadow-2xl backdrop-blur-md flex-col gap-1 text-[11px] text-zinc-300">
-            <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{t('map.legendTitle')}</div>
+            <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">{t.mapLegendTitle}</div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-0.5 bg-sky-400 inline-block border-t border-dashed border-sky-300" />
-              <span>{language === 'en' ? 'Dashed Blue: Megathrust Trenches (PUSGEN)' : 'Garis Putus Biru: Palung Megathrust (PUSGEN)'}</span>
+              <span>{t.mapLegendSubduction}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-0.5 bg-amber-400 inline-block" />
-              <span>{language === 'en' ? 'Solid Orange: Active Inland Faults (BMKG)' : 'Garis Oranye: Sesar / Patahan Aktif (BMKG)'}</span>
+              <span>{t.mapLegendFault}</span>
             </div>
             <div className="flex items-center gap-3 mt-0.5 pt-0.5 border-t border-zinc-800 text-[10px]">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> {language === 'en' ? 'Volcano' : 'Gunung Api'}</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Live Gempa</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-blue-500" /> Megathrust</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400" /> Sesar</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-500" /> {t.mapLegendVolcano}</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> {t.mapLegendBmkg}</span>
             </div>
           </div>
         </div>
@@ -539,7 +539,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
 
       {/* Single Line Footer Note */}
       <div className="text-center text-[10px] text-zinc-500 mt-1.5 shrink-0">
-        © 2026 RAWAN • {t('footer.platformInfo')}
+        © 2026 RAWAN • {language === 'en' ? 'Geospatial Disaster Hazard Geoportal & Real-Time BMKG TEWS Telemetry' : 'Geoportal Geospasial Kebencanaan & Monitoring Seismik BMKG TEWS Indonesia'}
       </div>
     </section>
   );

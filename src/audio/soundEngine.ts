@@ -323,7 +323,7 @@ class SoundEngine {
     } catch {}
   }
 
-  // Text-To-Speech Narration in Indonesian & English
+  // Text-To-Speech Narration (Bilingual: ID & EN)
   public speak(text: string, lang: 'id' | 'en' = 'id') {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel(); // cancel any ongoing speech
@@ -332,24 +332,19 @@ class SoundEngine {
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     
-    // Select appropriate voice if available
+    // Attempt to select matching language voice if available
     const voices = window.speechSynthesis.getVoices();
-    if (lang === 'en') {
-      const enVoice = voices.find(v => v.lang.startsWith('en') || v.lang.includes('US') || v.lang.includes('GB'));
-      if (enVoice) utterance.voice = enVoice;
-    } else {
-      const idVoice = voices.find(v => v.lang.startsWith('id') || v.lang.includes('ID'));
-      if (idVoice) utterance.voice = idVoice;
+    const targetLangPrefix = lang === 'en' ? 'en' : 'id';
+    const voice = voices.find(v => v.lang.toLowerCase().startsWith(targetLangPrefix));
+    if (voice) {
+      utterance.voice = voice;
     }
     window.speechSynthesis.speak(utterance);
   }
 
+  // Backward compatibility
   public speakIndonesian(text: string) {
     this.speak(text, 'id');
-  }
-
-  public speakEnglish(text: string) {
-    this.speak(text, 'en');
   }
 
   public stopSpeaking() {

@@ -5,8 +5,7 @@ import {
   Volume2, 
   Type, 
   Sliders, 
-  Check,
-  Languages
+  Globe 
 } from 'lucide-react';
 import { soundEngine } from '../audio/soundEngine';
 import { useLanguage } from '../context/LanguageContext';
@@ -41,14 +40,14 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
       <div className="w-full max-w-md max-h-[92dvh] overflow-y-auto custom-scrollbar bg-zinc-950/95 border border-emerald-500/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-2xl">
         
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-zinc-800 mb-6">
+        <div className="flex items-center justify-between pb-4 border-b border-zinc-800 mb-5">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-400">
               <Sliders className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">{t('accessibility.title')}</h3>
-              <p className="text-xs text-slate-400">{t('accessibility.subtitle')}</p>
+              <h3 className="text-lg font-bold text-white">{t.accTitle}</h3>
+              <p className="text-xs text-slate-400">{t.accSubtitle}</p>
             </div>
           </div>
           <button
@@ -63,13 +62,13 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
         </div>
 
         {/* Options List */}
-        <div className="space-y-4">
+        <div className="space-y-3.5">
           
           {/* Language Selection */}
-          <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+          <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-300 mb-2.5">
-              <Languages className="w-4 h-4 text-emerald-400" />
-              <span>{t('accessibility.languageSection')}</span>
+              <Globe className="w-4 h-4 text-emerald-400" />
+              <span>{t.accLanguageLabel}</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -77,46 +76,41 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
                   soundEngine.playClick();
                   setLanguage('id');
                 }}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 ${
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-2 ${
                   language === 'id'
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 shadow-sm'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm'
                     : 'bg-zinc-800/60 text-slate-400 border-zinc-700/60 hover:text-slate-200'
                 }`}
               >
-                <span>🇮🇩</span>
-                <span>{t('accessibility.langId')}</span>
-                {language === 'id' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                <span>🇮🇩</span> {t.accLanguageId}
               </button>
-
               <button
                 onClick={() => {
                   soundEngine.playClick();
                   setLanguage('en');
                 }}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 ${
+                className={`py-2 px-3 rounded-xl text-xs font-semibold border transition-all flex items-center justify-center gap-2 ${
                   language === 'en'
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 shadow-sm'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm'
                     : 'bg-zinc-800/60 text-slate-400 border-zinc-700/60 hover:text-slate-200'
                 }`}
               >
-                <span>🇬🇧</span>
-                <span>{t('accessibility.langEn')}</span>
-                {language === 'en' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                <span>🇬🇧</span> {t.accLanguageEn}
               </button>
             </div>
           </div>
 
           {/* Text Size */}
-          <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+          <div className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-300 mb-2.5">
               <Type className="w-4 h-4 text-emerald-400" />
-              <span>{t('accessibility.textSize')}</span>
+              <span>{t.accTextSizeLabel}</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'normal', label: t('accessibility.sizeNormal') },
-                { id: 'large', label: t('accessibility.sizeLarge') },
-                { id: 'xlarge', label: t('accessibility.sizeXLarge') }
+                { id: 'normal', label: t.accSizeNormal },
+                { id: 'large', label: t.accSizeLarge },
+                { id: 'xlarge', label: t.accSizeXLarge }
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -142,16 +136,16 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
               soundEngine.playClick();
               onToggleVoiceNarration();
             }}
-            className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all"
+            className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all"
           >
             <div className="flex items-center gap-3">
-              <Volume2 className="w-5 h-5 text-emerald-400" />
+              <Volume2 className="w-5 h-5 text-emerald-400 shrink-0" />
               <div>
-                <div className="text-xs font-bold text-slate-200">{t('accessibility.tts')}</div>
-                <div className="text-[11px] text-slate-400">{t('accessibility.ttsDesc')}</div>
+                <div className="text-xs font-bold text-slate-200">{t.accNarrationLabel}</div>
+                <div className="text-[11px] text-slate-400">{t.accNarrationDesc}</div>
               </div>
             </div>
-            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
+            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 shrink-0 ${
               voiceNarrationEnabled ? 'bg-emerald-500' : 'bg-zinc-700'
             }`}>
               <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
@@ -166,16 +160,16 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
               soundEngine.playClick();
               onToggleHighContrast();
             }}
-            className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all"
+            className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all"
           >
             <div className="flex items-center gap-3">
-              <Eye className="w-5 h-5 text-amber-400" />
+              <Eye className="w-5 h-5 text-amber-400 shrink-0" />
               <div>
-                <div className="text-xs font-bold text-slate-200">{t('accessibility.highContrast')}</div>
-                <div className="text-[11px] text-slate-400">{t('accessibility.highContrastDesc')}</div>
+                <div className="text-xs font-bold text-slate-200">{t.accContrastLabel}</div>
+                <div className="text-[11px] text-slate-400">{t.accContrastDesc}</div>
               </div>
             </div>
-            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
+            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 shrink-0 ${
               highContrast ? 'bg-emerald-500' : 'bg-zinc-700'
             }`}>
               <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
@@ -190,16 +184,16 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
               soundEngine.playClick();
               onToggleReducedMotion();
             }}
-            className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all"
+            className="p-3.5 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-between cursor-pointer hover:border-zinc-700 transition-all"
           >
             <div className="flex items-center gap-3">
-              <Sliders className="w-5 h-5 text-emerald-400" />
+              <Sliders className="w-5 h-5 text-emerald-400 shrink-0" />
               <div>
-                <div className="text-xs font-bold text-slate-200">{t('accessibility.reducedMotion')}</div>
-                <div className="text-[11px] text-slate-400">{t('accessibility.reducedMotionDesc')}</div>
+                <div className="text-xs font-bold text-slate-200">{t.accMotionLabel}</div>
+                <div className="text-[11px] text-slate-400">{t.accMotionDesc}</div>
               </div>
             </div>
-            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
+            <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 shrink-0 ${
               reducedMotion ? 'bg-emerald-500' : 'bg-zinc-700'
             }`}>
               <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
@@ -215,9 +209,9 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
             soundEngine.playClick();
             onClose();
           }}
-          className="w-full mt-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-600/30 active:scale-98"
+          className="w-full mt-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-600/30"
         >
-          {t('detailModal.btnClose')}
+          {language === 'en' ? 'Close & Apply Settings' : 'Simpan Preferensi'}
         </button>
       </div>
     </div>

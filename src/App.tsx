@@ -14,19 +14,19 @@ import {
   PackageCheck, 
   Award, 
   Activity, 
-  Compass,
-  ArrowRight,
-  ShieldAlert,
-  Flame,
-  Waves,
-  Wind,
-  Layers
+  Compass, 
+  ArrowRight, 
+  ShieldAlert, 
+  Flame, 
+  Waves, 
+  Wind, 
+  Layers 
 } from 'lucide-react';
 
 import { DisasterId } from './types/disaster';
 import { getDisastersData } from './data/disasterData';
+import { useLanguage } from './context/LanguageContext';
 import { soundEngine } from './audio/soundEngine';
-import { LanguageProvider, useLanguage } from './context/LanguageContext';
 
 // 3D Scenes
 import { HomeEarthScene } from './scenes/HomeEarthScene';
@@ -125,9 +125,10 @@ const CameraController: React.FC<{
 };
 
 
-const MainContent: React.FC = () => {
+export const App: React.FC = () => {
   const { language, t } = useLanguage();
   const disastersData = getDisastersData(language);
+  const isEn = language === 'en';
 
   // Navigation & View State
   const [currentView, setCurrentView] = useState<'HOME' | 'MODULES' | 'SIMULATION' | 'MAP' | 'CHECKLIST' | 'QUIZ'>('HOME');
@@ -318,7 +319,7 @@ const MainContent: React.FC = () => {
               isSimulating={isSimulating}
               floodStage={floodStage}
               showCutaway={showCutaway}
-              onActionClick={(_act) => {
+              onActionClick={() => {
                 soundEngine.playCorrect();
                 addXp(50);
               }}
@@ -399,13 +400,14 @@ const MainContent: React.FC = () => {
             </h1>
 
             <p className="text-sm sm:text-lg md:text-xl font-extrabold text-white max-w-2xl mx-auto mb-1.5 sm:mb-2 leading-relaxed drop-shadow-sm">
-              {t('nav.brandTagline')}
+              {isEn ? 'Indonesian Youth Disaster Anticipation & Awareness Platform' : 'Ruang Antisipasi Waspada Anak Nusantara'}
             </p>
 
             <p className="text-[11px] sm:text-xs md:text-sm text-zinc-300 max-w-lg mx-auto mb-4 sm:mb-6 leading-relaxed px-2">
-              {language === 'en'
-                ? 'Master the science of natural hazards and 3D interactive emergency mitigation simulations designed for youth and future generations.'
-                : 'Belajar sains di balik bencana alam dan simulasi mitigasi penyelamatan diri 3 dimensi interaktif untuk siswa dan anak Indonesia.'}
+              {isEn 
+                ? 'Learn the science behind natural disasters and explore interactive 3D self-rescue simulations for students and youth across Indonesia.'
+                : 'Belajar sains di balik bencana alam dan simulasi mitigasi penyelamatan diri 3 dimensi interaktif untuk siswa dan anak Indonesia.'
+              }
             </p>
 
             {/* Main Call To Action Buttons */}
@@ -418,7 +420,7 @@ const MainContent: React.FC = () => {
                 className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
-                <span>{language === 'en' ? 'Start 3D Exploration' : 'Mulai Eksplorasi 3D'}</span>
+                <span>{isEn ? 'Start 3D Exploration' : 'Mulai Eksplorasi 3D'}</span>
               </button>
 
               <button
@@ -429,7 +431,7 @@ const MainContent: React.FC = () => {
                 className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 active:scale-95 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 border border-zinc-700 transition-all cursor-pointer shadow-md hover:border-zinc-500"
               >
                 <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                <span>{language === 'en' ? 'Explore Modules' : 'Pelajari Modul Bencana'}</span>
+                <span>{isEn ? 'Explore Disaster Modules' : 'Pelajari Modul Bencana'}</span>
               </button>
             </div>
           </div>
@@ -450,10 +452,10 @@ const MainContent: React.FC = () => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h4 className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
-                    {t('nav.map')}
+                    {isEn ? 'Indonesia Hazard Map' : 'Peta Bencana Indonesia'}
                   </h4>
                   <p className="text-[10px] text-zinc-400 truncate">
-                    {language === 'en' ? 'Live BMKG telemetry, volcanoes & active faults' : 'Live gempa BMKG, gunung api & sesar aktif'}
+                    {isEn ? 'Live BMKG seismic data, volcanoes & active faults' : 'Live gempa BMKG, gunung api & sesar aktif'}
                   </p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -472,10 +474,10 @@ const MainContent: React.FC = () => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h4 className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
-                    {t('nav.checklist')}
+                    {isEn ? 'Emergency Survival Kit (TSB)' : 'Tas Siaga Bencana (TSB)'}
                   </h4>
                   <p className="text-[10px] text-zinc-400 truncate">
-                    {language === 'en' ? '72-hour emergency survival readiness' : 'Kesiapan darurat 72 jam BNPB'}
+                    {isEn ? '72-hour BNPB emergency preparedness' : 'Kesiapan darurat 72 jam BNPB'}
                   </p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -494,10 +496,10 @@ const MainContent: React.FC = () => {
                 </div>
                 <div className="min-w-0 flex-1">
                   <h4 className="text-xs font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
-                    {t('nav.quiz')}
+                    {isEn ? 'Disaster Quiz & Exams' : 'Ujian & Kuis Kebencanaan'}
                   </h4>
                   <p className="text-[10px] text-zinc-400 truncate">
-                    {language === 'en' ? 'Test mitigation knowledge & earn XP' : 'Uji pemahaman & raih skor'}
+                    {isEn ? 'Test knowledge & earn XP scores' : 'Uji pemahaman & raih skor'}
                   </p>
                 </div>
                 <ArrowRight className="w-3.5 h-3.5 text-zinc-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
@@ -506,7 +508,10 @@ const MainContent: React.FC = () => {
 
             {/* Sleek single line copyright */}
             <div className="text-center text-[10px] text-zinc-500 mt-2.5">
-              {t('footer.copyright')}
+              {isEn
+                ? '© 2026 RAWAN (Indonesian Youth Disaster Anticipation & Awareness) • 3D Disaster Mitigation Education'
+                : '© 2026 RAWAN (Ruang Antisipasi Waspada Anak Nusantara) • Edukasi Mitigasi Kebencanaan 3D'
+              }
             </div>
           </div>
         </main>
@@ -518,22 +523,22 @@ const MainContent: React.FC = () => {
           <div className="mb-6">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-900 border border-emerald-600 text-emerald-400 text-xs font-bold mb-2">
               <Layers className="w-3 h-3" />
-              <span>{language === 'en' ? 'Interactive Learning Catalog' : 'Katalog Pembelajaran Interaktif'}</span>
+              <span>{isEn ? 'Interactive Learning Catalog' : 'Katalog Pembelajaran Interaktif'}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-              {language === 'en' ? '6 Natural Disaster Modules' : '6 Modul Bencana Alam'}
+              {isEn ? '6 Natural Disaster Modules' : '6 Modul Bencana Alam'}
             </h2>
             <p className="text-xs text-zinc-400 mt-1">
-              {language === 'en' 
-                ? 'Select a module to discover the STEM science behind disasters and evaluate your emergency mitigation responses' 
-                : 'Pilih modul untuk mempelajari sains di balik bencana dan menguji kesiapan mitigasi Anda'}
+              {isEn 
+                ? 'Select a module to learn the science behind disasters and test your mitigation preparedness'
+                : 'Pilih modul untuk mempelajari sains di balik bencana dan menguji kesiapan mitigasi Anda'
+              }
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             {disasterList.map((id) => {
               const data = disastersData[id];
-              const displayName = language === 'en' ? data.name : data.indonesianName;
               return (
                 <div
                   key={id}
@@ -559,7 +564,7 @@ const MainContent: React.FC = () => {
                     </div>
 
                     <h3 className="text-base sm:text-lg font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">
-                      {displayName}
+                      {isEn ? data.name : data.indonesianName}
                     </h3>
                     <p className="text-xs text-zinc-400 mb-3 line-clamp-2 leading-relaxed">
                       {data.subtitle}
@@ -578,7 +583,8 @@ const MainContent: React.FC = () => {
                       }}
                       className="py-2 px-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 border border-zinc-800 cursor-pointer"
                     >
-                      <BookOpen className="w-3 h-3" /> {language === 'en' ? 'Learn' : 'Pelajari'}
+                      <BookOpen className="w-3 h-3" />
+                      <span>{isEn ? 'Learn' : 'Pelajari'}</span>
                     </button>
 
                     <button
@@ -588,7 +594,8 @@ const MainContent: React.FC = () => {
                       }}
                       className="py-2 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
                     >
-                      <Play className="w-3 h-3 fill-white" /> {language === 'en' ? 'Simulate' : 'Simulasi'}
+                      <Play className="w-3 h-3 fill-white" />
+                      <span>{isEn ? 'Simulate' : 'Simulasi'}</span>
                     </button>
                   </div>
                 </div>
@@ -651,14 +658,6 @@ const MainContent: React.FC = () => {
       )}
 
     </div>
-  );
-};
-
-export const App: React.FC = () => {
-  return (
-    <LanguageProvider>
-      <MainContent />
-    </LanguageProvider>
   );
 };
 
