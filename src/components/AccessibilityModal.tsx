@@ -5,9 +5,11 @@ import {
   Volume2, 
   Type, 
   Sliders, 
-  Check 
+  Check,
+  Languages
 } from 'lucide-react';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 
 interface AccessibilityModalProps {
   onClose: () => void;
@@ -32,6 +34,8 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
   voiceNarrationEnabled,
   onToggleVoiceNarration
 }) => {
+  const { language, setLanguage, t } = useLanguage();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
       <div className="w-full max-w-md max-h-[92dvh] overflow-y-auto custom-scrollbar bg-zinc-950/95 border border-emerald-500/30 rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-2xl backdrop-blur-2xl">
@@ -43,8 +47,8 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
               <Sliders className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Pengaturan Aksesibilitas</h3>
-              <p className="text-xs text-slate-400">Kenyamanan belajar untuk semua siswa</p>
+              <h3 className="text-lg font-bold text-white">{t('accessibility.title')}</h3>
+              <p className="text-xs text-slate-400">{t('accessibility.subtitle')}</p>
             </div>
           </div>
           <button
@@ -61,17 +65,58 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
         {/* Options List */}
         <div className="space-y-4">
           
+          {/* Language Selection */}
+          <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
+            <div className="flex items-center gap-2 text-xs font-bold text-slate-300 mb-2.5">
+              <Languages className="w-4 h-4 text-emerald-400" />
+              <span>{t('accessibility.languageSection')}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  setLanguage('id');
+                }}
+                className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 ${
+                  language === 'id'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 shadow-sm'
+                    : 'bg-zinc-800/60 text-slate-400 border-zinc-700/60 hover:text-slate-200'
+                }`}
+              >
+                <span>🇮🇩</span>
+                <span>{t('accessibility.langId')}</span>
+                {language === 'id' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+              </button>
+
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  setLanguage('en');
+                }}
+                className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all flex items-center justify-center gap-2 ${
+                  language === 'en'
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/60 shadow-sm'
+                    : 'bg-zinc-800/60 text-slate-400 border-zinc-700/60 hover:text-slate-200'
+                }`}
+              >
+                <span>🇬🇧</span>
+                <span>{t('accessibility.langEn')}</span>
+                {language === 'en' && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+              </button>
+            </div>
+          </div>
+
           {/* Text Size */}
           <div className="p-4 rounded-2xl bg-zinc-900 border border-zinc-800">
             <div className="flex items-center gap-2 text-xs font-bold text-slate-300 mb-2.5">
               <Type className="w-4 h-4 text-emerald-400" />
-              <span>Ukuran Teks Tampilan</span>
+              <span>{t('accessibility.textSize')}</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[
-                { id: 'normal', label: 'Normal' },
-                { id: 'large', label: 'Besar' },
-                { id: 'xlarge', label: 'Ekstra' }
+                { id: 'normal', label: t('accessibility.sizeNormal') },
+                { id: 'large', label: t('accessibility.sizeLarge') },
+                { id: 'xlarge', label: t('accessibility.sizeXLarge') }
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -102,8 +147,8 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
             <div className="flex items-center gap-3">
               <Volume2 className="w-5 h-5 text-emerald-400" />
               <div>
-                <div className="text-xs font-bold text-slate-200">Narasi Suara Otomatis</div>
-                <div className="text-[11px] text-slate-400">Bacakan materi edukasi dalam Bahasa Indonesia</div>
+                <div className="text-xs font-bold text-slate-200">{t('accessibility.tts')}</div>
+                <div className="text-[11px] text-slate-400">{t('accessibility.ttsDesc')}</div>
               </div>
             </div>
             <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
@@ -126,8 +171,8 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
             <div className="flex items-center gap-3">
               <Eye className="w-5 h-5 text-amber-400" />
               <div>
-                <div className="text-xs font-bold text-slate-200">Mode Kontras Tinggi</div>
-                <div className="text-[11px] text-slate-400">Pertajam kontras teks dan batas kartu informasi</div>
+                <div className="text-xs font-bold text-slate-200">{t('accessibility.highContrast')}</div>
+                <div className="text-[11px] text-slate-400">{t('accessibility.highContrastDesc')}</div>
               </div>
             </div>
             <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
@@ -150,8 +195,8 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
             <div className="flex items-center gap-3">
               <Sliders className="w-5 h-5 text-emerald-400" />
               <div>
-                <div className="text-xs font-bold text-slate-200">Reduksi Animasi & Guncangan</div>
-                <div className="text-[11px] text-slate-400">Kurangi efek getaran kamera 3D untuk kenyamanan mata</div>
+                <div className="text-xs font-bold text-slate-200">{t('accessibility.reducedMotion')}</div>
+                <div className="text-[11px] text-slate-400">{t('accessibility.reducedMotionDesc')}</div>
               </div>
             </div>
             <div className={`w-10 h-6 rounded-full transition-colors flex items-center px-1 ${
@@ -170,9 +215,9 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
             soundEngine.playClick();
             onClose();
           }}
-          className="w-full mt-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-600/30"
+          className="w-full mt-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-600/30 active:scale-98"
         >
-          Simpan Preferensi
+          {t('detailModal.btnClose')}
         </button>
       </div>
     </div>

@@ -323,21 +323,33 @@ class SoundEngine {
     } catch {}
   }
 
-  // Text-To-Speech Narration in Indonesian
-  public speakIndonesian(text: string) {
+  // Text-To-Speech Narration in Indonesian & English
+  public speak(text: string, lang: 'id' | 'en' = 'id') {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel(); // cancel any ongoing speech
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'id-ID';
+    utterance.lang = lang === 'en' ? 'en-US' : 'id-ID';
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
-    // Attempt to select an Indonesian voice if available
+    
+    // Select appropriate voice if available
     const voices = window.speechSynthesis.getVoices();
-    const idVoice = voices.find(v => v.lang.startsWith('id') || v.lang.includes('ID'));
-    if (idVoice) {
-      utterance.voice = idVoice;
+    if (lang === 'en') {
+      const enVoice = voices.find(v => v.lang.startsWith('en') || v.lang.includes('US') || v.lang.includes('GB'));
+      if (enVoice) utterance.voice = enVoice;
+    } else {
+      const idVoice = voices.find(v => v.lang.startsWith('id') || v.lang.includes('ID'));
+      if (idVoice) utterance.voice = idVoice;
     }
     window.speechSynthesis.speak(utterance);
+  }
+
+  public speakIndonesian(text: string) {
+    this.speak(text, 'id');
+  }
+
+  public speakEnglish(text: string) {
+    this.speak(text, 'en');
   }
 
   public stopSpeaking() {

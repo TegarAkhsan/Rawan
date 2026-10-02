@@ -22,11 +22,13 @@ import {
   Wind,
   Waves,
   Activity,
-  ShieldCheck
+  ShieldCheck,
+  Volume2
 } from 'lucide-react';
 import { DisasterId } from '../types/disaster';
-import { SIMULATION_SCENARIOS, DISASTERS_DATA } from '../data/disasterData';
+import { getSimulationScenario, getDisaster } from '../data/disasterData';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 import type { EruptionStage } from '../scenes/VolcanoScene';
 import type { TsunamiStage } from '../scenes/TsunamiScene';
 import type { FloodStage } from '../scenes/FloodScene';
@@ -34,8 +36,8 @@ import type { EarthquakeStage } from '../scenes/EarthquakeScene';
 import type { LandslideStage } from '../scenes/LandslideScene';
 import type { TornadoStage } from '../scenes/TornadoScene';
 
-// ── Tornado Stages Data ─────────────────────────────────────────────
-const TORNADO_STAGES = [
+// ── Tornado Stages Data (ID & EN) ───────────────────────────────────
+const TORNADO_STAGES_ID = [
   {
     id: 'NORMAL',
     title: 'Kondisi Cuaca Cerah',
@@ -108,8 +110,81 @@ const TORNADO_STAGES = [
   }
 ];
 
-// ── Landslide Stages Data ─────────────────────────────────────────────
-const LANDSLIDE_STAGES = [
+const TORNADO_STAGES_EN = [
+  {
+    id: 'NORMAL',
+    title: 'Clear Weather Conditions',
+    subtitle: 'Stable Atmosphere & Calm Winds',
+    pvmbgLevel: 'Normal (EF-0 Scale)',
+    pvmbgColor: '#22c55e',
+    icon: Wind,
+    description: 'The residential atmosphere is calm and stable. Wind speeds are low (< 15 km/h), skies are partly cloudy, and residents carry out daily activities normally.',
+    visualHint: 'Observe the peaceful neighborhood, standing trees, and clear daylight sky.'
+  },
+  {
+    id: 'SUPERCELL_INFLOW',
+    title: 'Supercell Storm Cloud & Warm Inflow',
+    subtitle: 'Warm-Cold Air Mass Convergence',
+    pvmbgLevel: 'Severe Weather Watch',
+    pvmbgColor: '#eab308',
+    icon: CloudLightning,
+    description: 'Warm moist air rises rapidly (updraft) colliding with cold air masses. A dark greenish Cumulonimbus supercell forms accompanied by lightning and torrential squalls.',
+    visualHint: 'The sky darkens into a severe storm, lightning flashes across the sky, and heavy rain pours down.'
+  },
+  {
+    id: 'MESOCYCLONE_ROTATION',
+    title: 'Mesocyclone Rotation (Wall Cloud)',
+    subtitle: 'Rotating Vertical Air Column',
+    pvmbgLevel: 'Tornado / Whirlwind Watch',
+    pvmbgColor: '#f97316',
+    icon: AlertTriangle,
+    description: 'A vertical rotating vortex (mesocyclone) forms inside the supercell. A rotating wall cloud descends toward residential rooftops. Trees bend under strong gusts.',
+    visualHint: 'Watch the dark rotating wall cloud disk descend from the storm cloud canopy!'
+  },
+  {
+    id: 'CONDENSATION_FUNNEL',
+    title: 'Descending Condensation Funnel',
+    subtitle: 'Condensation Funnel Descending',
+    pvmbgLevel: 'Tornado Warning (EF-2)',
+    pvmbgColor: '#ef4444',
+    icon: Zap,
+    description: 'Air pressure at the vortex core drops sharply causing water vapor to condense into a funnel cloud stretching downward toward homes. Seek shelter immediately!',
+    visualHint: 'A funnel cloud extends from the cloud base to neighborhood streets; trees lean sharply!'
+  },
+  {
+    id: 'TOUCHDOWN_VIOLENT',
+    title: 'Violent Tornado Touchdown',
+    subtitle: 'Touchdown & Debris Vortex EF-3',
+    pvmbgLevel: 'CRITICAL HAZARD / TORNADO TOUCHDOWN',
+    pvmbgColor: '#ef4444',
+    icon: AlertOctagon,
+    description: 'TORNADO TOUCHDOWN! The vortex with speeds > 150 km/h slams into the neighborhood. Roofs, tree limbs, and debris spiral violently. Power lines snap and spark!',
+    visualHint: 'Massive impact! The funnel hits the ground, roofs fly, and electrical transformers spark on utility poles!'
+  },
+  {
+    id: 'SAFE_ROOM_MITIGATION',
+    title: 'Safe Room & Interior Shelter Mitigation',
+    subtitle: 'Protect Head in Windowless Ground Room',
+    pvmbgLevel: 'Protective Action Protocol',
+    pvmbgColor: '#38bdf8',
+    icon: ShieldCheck,
+    description: 'STAY AWAY FROM WINDOWS! Move into the innermost ground-floor room without windows (bathroom, interior hallway) or underground bunker. Protect your head under a sturdy table.',
+    visualHint: 'Look at the house cutaway: residents shelter safely inside the inner room protected from flying debris!'
+  },
+  {
+    id: 'AFTERMATH_RECOVERY',
+    title: 'Post-Storm Relief & Assessment',
+    subtitle: 'SAR Evacuation & Power Grid Safety',
+    pvmbgLevel: 'Post-Disaster Recovery',
+    pvmbgColor: '#22c55e',
+    icon: Wind,
+    description: 'The whirlwind vortex has lifted and dissipated. Beware of secondary hazards such as exposed live power wires and sharp glass debris. Disaster relief teams arrive for recovery.',
+    visualHint: 'Weather clears up; disaster management teams assess damage and secure the perimeter.'
+  }
+];
+
+// ── Landslide Stages Data (ID & EN) ──────────────────────────────────
+const LANDSLIDE_STAGES_ID = [
   {
     id: 'NORMAL',
     title: 'Kondisi Lereng Stabil',
@@ -182,8 +257,81 @@ const LANDSLIDE_STAGES = [
   }
 ];
 
-// ── Earthquake Stages Data ───────────────────────────────────────────
-const EARTHQUAKE_STAGES = [
+const LANDSLIDE_STAGES_EN = [
+  {
+    id: 'NORMAL',
+    title: 'Stable Slope Equilibrium',
+    subtitle: 'Natural Mountain Slope Balance',
+    pvmbgLevel: 'Stable / Safe Zone',
+    pvmbgColor: '#22c55e',
+    icon: Mountain,
+    description: 'Mountain hillside is in stable equilibrium with balanced shear stress. Dense forest binds surface soils, groundwater flows normally, and the valley road is safe.',
+    visualHint: 'Observe the lush green slope, solid soil strata above bedrock, and dense vegetation.'
+  },
+  {
+    id: 'HEAVY_RAIN',
+    title: 'Severe Torrential Storm',
+    subtitle: 'Continuous Extreme Precipitation',
+    pvmbgLevel: 'Severe Weather Warning',
+    pvmbgColor: '#eab308',
+    icon: CloudLightning,
+    description: 'Prolonged torrential rain pours over the hill slopes. Rainwater infiltrates soil pores, adding heavy mass burden to the upper slope.',
+    visualHint: 'Heavy rain drenches the hillside, overcast skies darken, and water begins soaking deep into soil strata.'
+  },
+  {
+    id: 'SOIL_SATURATION',
+    title: 'Soil Saturation & Pore Pressure',
+    subtitle: 'Pore Water Pressure & Saturated Aquifer',
+    pvmbgLevel: 'Landslide Advisory (Level 2)',
+    pvmbgColor: '#38bdf8',
+    icon: Zap,
+    description: 'Soil strata reach full water saturation. Pore water pressure increases drastically, reducing soil cohesion and shearing strength along subsurface bedrock.',
+    visualHint: 'Look at the geological cutaway: saturated aquifer layers emit upward pore water pressure arrows!'
+  },
+  {
+    id: 'TENSION_CRACKING',
+    title: 'Crown Tension Cracking',
+    subtitle: 'Crown Tension Cracks & Leaning Trees',
+    pvmbgLevel: 'Landslide Warning (Level 3)',
+    pvmbgColor: '#f97316',
+    icon: AlertTriangle,
+    description: 'Early warning signs! Horseshoe-shaped tension cracks form along the slope crown. Trees and power poles tilt losing anchorage. Subterranean earth rumble echoes!',
+    visualHint: 'Notice crown tension cracks rupturing across the hilltop and trees leaning forward!'
+  },
+  {
+    id: 'SLOPE_FAILURE',
+    title: 'Mass Slope Failure & Debris Avalanche',
+    subtitle: 'Slope Failure, Mudflow & Debris Avalanche',
+    pvmbgLevel: 'CRITICAL LANDSLIDE HAZARD',
+    pvmbgColor: '#ef4444',
+    icon: AlertOctagon,
+    description: 'MASSIVE LANDSLIDE OCCURS! The slip plane collapses instantly. Hundreds of tons of saturated soil, boulders, and mud surge downhill at high speed sweeping roads and trees!',
+    visualHint: 'Massive avalanche! Mud, boulders, and falling trees slide rapidly down the geological slip plane!'
+  },
+  {
+    id: 'VALLEY_IMPACT_MITIGATION',
+    title: 'Emergency Lateral Evacuation',
+    subtitle: 'Run Perpendicular to Slide Path',
+    pvmbgLevel: 'Emergency Evacuation Protocol',
+    pvmbgColor: '#38bdf8',
+    icon: Mountain,
+    description: 'DO NOT RUN DOWNHILL ALONG THE VALLEY! Perform LATERAL EVACUATION: sprint sideways perpendicular to the landslide path toward higher safe ground and the designated Assembly Point!',
+    visualHint: 'Residents evacuate swiftly to the right toward the Safe Valley Assembly Point, clear of the debris path!'
+  },
+  {
+    id: 'AFTERMATH',
+    title: 'Post-Disaster & Slope Stabilization',
+    subtitle: 'SAR, Retaining Gabions & Deep Roots',
+    pvmbgLevel: 'Slope Stabilization & Recovery',
+    pvmbgColor: '#22c55e',
+    icon: Wind,
+    description: 'Debris flow is arrested at retaining walls and wire gabions. SAR teams and medical personnel rescue survivors at the emergency shelter. Terracing and vetiver grass planting begin.',
+    visualHint: 'Emergency tents and ambulances operate at the assembly point; retaining walls hold slide deposits.'
+  }
+];
+
+// ── Earthquake Stages Data (ID & EN) ─────────────────────────────────
+const EARTHQUAKE_STAGES_ID = [
   {
     id: 'NORMAL',
     title: 'Kondisi Normal & Stabil',
@@ -256,8 +404,81 @@ const EARTHQUAKE_STAGES = [
   }
 ];
 
-// ── Volcano Eruption Stages Data ──────────────────────────────────────
-const ERUPTION_STAGES = [
+const EARTHQUAKE_STAGES_EN = [
+  {
+    id: 'NORMAL',
+    title: 'Normal & Stable Conditions',
+    subtitle: 'Tectonic Plate Equilibrium',
+    pvmbgLevel: 'MMI Scale I (Normal)',
+    pvmbgColor: '#22c55e',
+    icon: Activity,
+    description: 'Earth tectonic plates are in balanced equilibrium. Seismic background activity is minimal. Buildings, schools, roads, and citizens operate safely with zero tremor.',
+    visualHint: 'Observe the peaceful city and the solid subterranean crust layers below.'
+  },
+  {
+    id: 'STRESS_ACCUMULATION',
+    title: 'Tectonic Stress Accumulation',
+    subtitle: 'Tectonic Stress & Locked Fault',
+    pvmbgLevel: 'MMI Scale II (Advisory)',
+    pvmbgColor: '#eab308',
+    icon: AlertTriangle,
+    description: 'Convergent tectonic plate boundaries collide and lock due to rock friction. Elastic strain energy builds up massively along the deep fault plane.',
+    visualHint: 'Notice the subterranean fault zone glowing yellow as high tectonic stress accumulates.'
+  },
+  {
+    id: 'FAULT_RUPTURE',
+    title: 'Hypocenter Energy Release',
+    subtitle: 'Fault Rupture & Hypocenter Focus',
+    pvmbgLevel: 'MMI Scale III-IV (Alert)',
+    pvmbgColor: '#f97316',
+    icon: Zap,
+    description: 'SUDDEN ROCK RUPTURE! Rock friction can no longer hold the accumulated plate stress. A sudden fault rupture occurs at the subterranean hypocenter releasing massive seismic shockwaves.',
+    visualHint: 'Watch the radiant energy flash at the subterranean hypocenter focus point as the fault slips!'
+  },
+  {
+    id: 'P_WAVE',
+    title: 'Primary Wave Arrival (P-Wave)',
+    subtitle: 'Compressional Wave Arrival (V ≈ 6-8 km/s)',
+    pvmbgLevel: 'Earthquake Early Warning (EEW)',
+    pvmbgColor: '#38bdf8',
+    icon: Radio,
+    description: 'The fastest longitudinal seismic waves (P-waves) propagate upwards to the surface (Epicenter), causing initial vertical tremors and deep underground rumbling. Early warning sirens sound!',
+    visualHint: 'See the blue P-wave rings shooting to the surface and initial vibrations begin at ground level.'
+  },
+  {
+    id: 'S_WAVE_SURFACE',
+    title: 'Destructive S-Wave Shaking',
+    subtitle: 'Shear & Surface Waves Destructive Phase',
+    pvmbgLevel: 'MMI Scale VI-VIII (Critical)',
+    pvmbgColor: '#ef4444',
+    icon: AlertOctagon,
+    description: 'S-WAVES & SURFACE WAVES STRIKE! Transverse shear waves shake ground structures vigorously in multiple axes. Buildings sway violently, ground fissures open, and power lines spark!',
+    visualHint: 'Violent shaking! Buildings sway intensely, surface ground cracks split open along the fault!'
+  },
+  {
+    id: 'STRUCTURAL_DAMAGE_MITIGATION',
+    title: 'Emergency Mitigation Protocol',
+    subtitle: 'Drop, Cover, Hold On & Field Evacuation',
+    pvmbgLevel: 'Emergency Response Action',
+    pvmbgColor: '#38bdf8',
+    icon: Mountain,
+    description: 'INDOORS: Perform DROP (drop to your hands and knees), COVER (take shelter under a sturdy table, protect head/neck), HOLD ON (grip table legs). OUTDOORS: Evacuate immediately to open fields!',
+    visualHint: 'Look inside the building cutaway: people shelter under sturdy desks and gather safely in the open assembly park!'
+  },
+  {
+    id: 'AFTERMATH',
+    title: 'Post-Quake & Aftershocks Watch',
+    subtitle: 'Aftershocks, SAR & Damage Assessment',
+    pvmbgLevel: 'Recovery & Aftershock Alert',
+    pvmbgColor: '#f97316',
+    icon: Wind,
+    description: 'Mainshock shaking subsides but aftershocks remain hazardous. Stay out of damaged or tilted buildings. SAR teams and medics arrive at the Assembly Point for triage.',
+    visualHint: 'Emergency field clinic and SAR ambulances active at the assembly point; clear evacuation routes.'
+  }
+];
+
+// ── Volcano Eruption Stages Data (ID & EN) ───────────────────────────
+const ERUPTION_STAGES_ID = [
   {
     id: 'NORMAL',
     title: 'Gunung Normal',
@@ -330,8 +551,81 @@ const ERUPTION_STAGES = [
   },
 ];
 
-// ── Tsunami Stages Data ───────────────────────────────────────────────
-const TSUNAMI_STAGES = [
+const ERUPTION_STAGES_EN = [
+  {
+    id: 'NORMAL',
+    title: 'Normal Volcano',
+    subtitle: 'Dormant Phase',
+    pvmbgLevel: 'Level I — Normal',
+    pvmbgColor: '#22c55e',
+    icon: Mountain,
+    description: 'Volcano is in a quiescent state with low volcanic activity. The crater lake is calm with no significant toxic gas emissions. Surrounding communities conduct normal daily routines.',
+    visualHint: 'Observe the peaceful volcano — no heavy smoke, calm lava glow, peaceful ambient atmosphere.'
+  },
+  {
+    id: 'UNREST',
+    title: 'Volcanic Unrest',
+    subtitle: 'Magmatic Unrest & Microtremors',
+    pvmbgLevel: 'Level II — Advisory',
+    pvmbgColor: '#eab308',
+    icon: AlertTriangle,
+    description: 'Magma ascends from the deep magma chamber. Shallow volcanic tremors occur. Crater lake temperature rises and thin solfatara steam emissions appear.',
+    visualHint: 'Notice subtle ground micro-tremors and thin white steam venting from the summit crater.'
+  },
+  {
+    id: 'PHREATIC',
+    title: 'Phreatic Eruption',
+    subtitle: 'Steam-Driven Explosion',
+    pvmbgLevel: 'Level II — Advisory',
+    pvmbgColor: '#eab308',
+    icon: CloudLightning,
+    description: 'Groundwater superheats upon contacting magma, flashing into high-pressure steam. Steam explosions eject crater wall rocks and fine ash without new magma reaching the surface.',
+    visualHint: 'Watch the sudden ash plume venting from the summit and hazard boundary rings appearing.'
+  },
+  {
+    id: 'MAGMATIC_RISE',
+    title: 'Lava Dome Growth',
+    subtitle: 'Viscous Lava Dome Extrusion',
+    pvmbgLevel: 'Level III — Alert',
+    pvmbgColor: '#f97316',
+    icon: Flame,
+    description: 'Viscous andesitic magma breaches the surface, building an unstable lava dome inside the summit crater. Dome collapse can trigger pyroclastic density currents at any moment.',
+    visualHint: 'Incandescent red lava dome grows inside the crater. Thick smoke billows out. Hazard zones active!'
+  },
+  {
+    id: 'ERUPTION',
+    title: 'Explosive Plinian Eruption',
+    subtitle: 'Climax — Plinian Column',
+    pvmbgLevel: 'Level IV — Evacuation Warning',
+    pvmbgColor: '#ef4444',
+    icon: Zap,
+    description: 'MAJOR EXPLOSIVE ERUPTION! High-velocity eruption column shoots into the stratosphere, umbrella cloud forms, volcanic bombs eject, and lethal pyroclastic flows race down slopes. EVACUATE NOW!',
+    visualHint: 'Full eruption active — soaring ash plume, rolling pyroclastic currents, incandescent lava, and volcanic lightning!'
+  },
+  {
+    id: 'LAVA_FLOW',
+    title: 'Lava Flow & Lahar Downslope',
+    subtitle: 'Lava Flow & Debris Lahar',
+    pvmbgLevel: 'Level IV — Evacuation Warning',
+    pvmbgColor: '#ef4444',
+    icon: Flame,
+    description: 'Fluid molten lava streams down the mountain flanks, incinerating obstacles and forming glowing lava channels. Hot lahars race down river channels during rain. FULL EVACUATION REMAINS IN EFFECT!',
+    visualHint: 'Look at the mountain slope — glowing red lava flows stretch into the valley, pooling below.'
+  },
+  {
+    id: 'POST_ERUPTION',
+    title: 'Post-Eruption & Secondary Hazards',
+    subtitle: 'Post-Eruption Phase & Cold Lahars',
+    pvmbgLevel: 'Level III — Alert',
+    pvmbgColor: '#f97316',
+    icon: Wind,
+    description: 'Eruptive explosions subside, but secondary hazards persist. Heavy tephra/ash blankets rooftops, and rainfall triggers cold lahars down valleys. SAR teams conduct relief operations.',
+    visualHint: 'Ashfall blankets the scenery, smoke thins out, trees covered in gray ash. Emergency rescue shelters active.'
+  }
+];
+
+// ── Tsunami Stages Data (ID & EN) ────────────────────────────────────
+const TSUNAMI_STAGES_ID = [
   {
     id: 'NORMAL',
     title: 'Kondisi Normal',
@@ -404,8 +698,81 @@ const TSUNAMI_STAGES = [
   }
 ];
 
-// ── Flood Stages Data ────────────────────────────────────────────────
-const FLOOD_STAGES = [
+const TSUNAMI_STAGES_EN = [
+  {
+    id: 'NORMAL',
+    title: 'Normal Coastal Conditions',
+    subtitle: 'Calm Ocean & Coastal Village',
+    pvmbgLevel: 'Normal Status',
+    pvmbgColor: '#22c55e',
+    icon: Waves,
+    description: 'The ocean is calm with regular shoreline swells. Fishing outriggers sail peacefully and coastal stilt homes are safe.',
+    visualHint: 'Calm ocean surface, normal tide levels, and gentle shoreline waves.'
+  },
+  {
+    id: 'UNDERSEA_QUAKE',
+    title: 'Undersea Megathrust Earthquake',
+    subtitle: 'Tectonic Plate Rupture (M > 7.0)',
+    pvmbgLevel: 'Undersea Earthquake Alert',
+    pvmbgColor: '#eab308',
+    icon: AlertTriangle,
+    description: 'Vertical rupture of undersea tectonic plates triggers a powerful megathrust earthquake. Sea floor uplifts violently, displacing massive oceanic water columns upward.',
+    visualHint: 'Notice undersea seabed tremors, rupturing fault cracks, and disturbed oceanic water columns.'
+  },
+  {
+    id: 'SEA_DRAWBACK',
+    title: 'Sudden Seawater Drawback',
+    subtitle: 'Tsunami Early Warning (TEWS)',
+    pvmbgLevel: 'Tsunami Watch / Warning',
+    pvmbgColor: '#f97316',
+    icon: Radio,
+    description: 'Seawater along the coastline suddenly and drastically recedes hundreds of meters, exposing coral reefs and sea floor. BMKG TEWS sirens blare! RUN TO HIGHER ELEVATION IMMEDIATELY!',
+    visualHint: 'Ocean water rapidly recedes far out to sea, and TEWS sirens flash and sound warning alerts!'
+  },
+  {
+    id: 'WAVE_APPROACH',
+    title: 'Approaching Tsunami Waves',
+    subtitle: 'Towering Wave Approach',
+    pvmbgLevel: 'Tsunami Inundation Warning',
+    pvmbgColor: '#ef4444',
+    icon: Zap,
+    description: 'A massive tsunami wave train forms in the open ocean and accelerates towards the coastline. As water depth shoals, wave amplitude surges skyward.',
+    visualHint: 'Towering cresting wave with white frothing foam surges rapidly towards the coastal shoreline!'
+  },
+  {
+    id: 'COASTAL_IMPACT',
+    title: 'Tsunami Coastal Impact',
+    subtitle: 'Coastal Inundation & Impact',
+    pvmbgLevel: 'Severe Inundation Hazard',
+    pvmbgColor: '#ef4444',
+    icon: AlertOctagon,
+    description: 'Tsunami surges slam over seawalls and tetrapods, crashing into coastal buildings with destructive kinetic energy. Coastal mangrove greenbelts dissipate wave force.',
+    visualHint: 'Ocean waters violently surge across coastal structures, sweeping debris inland!'
+  },
+  {
+    id: 'EVACUATION',
+    title: 'Emergency Hilltop Evacuation',
+    subtitle: 'High Ground Evacuation (>20m)',
+    pvmbgLevel: 'Evacuation in Progress',
+    pvmbgColor: '#38bdf8',
+    icon: Mountain,
+    description: 'Coastal residents flee along marked evacuation routes toward the Temporary Evacuation Shelter on high ground elevated > 20 meters above sea level. Avoid rivers and estuaries!',
+    visualHint: 'Hilltop evacuation post shines bright beacon lights; evacuation route clear above flood levels!'
+  },
+  {
+    id: 'POST_TSUNAMI',
+    title: 'Post-Tsunami Receding Phase',
+    subtitle: 'Receding Water & Emergency Relief',
+    pvmbgLevel: 'Emergency Relief Phase',
+    pvmbgColor: '#f97316',
+    icon: Wind,
+    description: 'Floodwaters recede back into the ocean carrying debris. Beware of successive waves arriving hours later. Remain at elevated ground until official BMKG/BPBD all-clear broadcasts.',
+    visualHint: 'Water recedes seaward, national flag flutters atop the safe hill, disaster response teams mobilized.'
+  }
+];
+
+// ── Flood Stages Data (ID & EN) ──────────────────────────────────────
+const FLOOD_STAGES_ID = [
   {
     id: 'NORMAL',
     title: 'Kondisi Normal',
@@ -478,6 +845,79 @@ const FLOOD_STAGES = [
   }
 ];
 
+const FLOOD_STAGES_EN = [
+  {
+    id: 'NORMAL',
+    title: 'Normal River & Drainage Conditions',
+    subtitle: 'Smooth River Flow & Clean Drainage',
+    pvmbgLevel: 'Safe Status',
+    pvmbgColor: '#22c55e',
+    icon: Waves,
+    description: 'Clear weather, river discharge within safe riverbanks, urban storm drains clear of debris, and residential neighborhoods operate safely.',
+    visualHint: 'River water flows safely inside channels; city streets and homes are dry.'
+  },
+  {
+    id: 'HEAVY_RAIN',
+    title: 'Severe Monsoon Torrent',
+    subtitle: 'Extreme Rainfall (>100 mm/day)',
+    pvmbgLevel: 'Severe Weather Warning',
+    pvmbgColor: '#eab308',
+    icon: CloudLightning,
+    description: 'Dense Cumulonimbus storm clouds unleash sustained heavy rainfall across the river basin. Soil infiltration capacity reaches saturation.',
+    visualHint: 'Heavy rain pours over the city, sky dims dark, and river levels begin rising.'
+  },
+  {
+    id: 'DRAINAGE_CLOG',
+    title: 'Urban Storm Drain Clogging',
+    subtitle: 'Sedimentation & Debris Blockage',
+    pvmbgLevel: 'Urban Waterlogging Watch',
+    pvmbgColor: '#eab308',
+    icon: AlertTriangle,
+    description: 'Accumulated trash and silt clog city culverts and drainage channels. Runoff cannot drain freely, flooding street surfaces ankle-deep (10-30 cm).',
+    visualHint: 'Puddles submerge roads and sidewalks; floating debris clogs drainage grates.'
+  },
+  {
+    id: 'RIVER_OVERFLOW',
+    title: 'Riverbank Overflow',
+    subtitle: 'Upstream Surge & Bank Overtopping',
+    pvmbgLevel: 'Flood Sluice Gate Alert 2',
+    pvmbgColor: '#f97316',
+    icon: Zap,
+    description: 'Upstream surge volume exceeds river channel containment capacity. Embankments begin seeping and muddy torrents spill across streets and house compounds.',
+    visualHint: 'River overflows containment walls, fast-flowing brown currents submerge front yards!'
+  },
+  {
+    id: 'URBAN_INUNDATION',
+    title: 'Residential Urban Inundation',
+    subtitle: 'Water Depth 1.0 - 1.8 Meters',
+    pvmbgLevel: 'Critical Flood Warning / Alert 1',
+    pvmbgColor: '#ef4444',
+    icon: AlertOctagon,
+    description: 'Deep murky floodwaters submerge the entire ground floor of homes and roadways. Vehicles are swept away. Turn off the main electrical breaker immediately!',
+    visualHint: 'Deep floodwaters submerge ground floors, cars float adrift, electrical sparks flash at utility poles!'
+  },
+  {
+    id: 'EMERGENCY_EVACUATION',
+    title: 'Vertical Evacuation & Boat Rescue',
+    subtitle: 'SAR Inflatable Boat Rescue',
+    pvmbgLevel: 'Emergency Evacuation Protocol',
+    pvmbgColor: '#38bdf8',
+    icon: Mountain,
+    description: 'Residents perform vertical evacuation to safe 2nd floors. Disaster management and SAR teams deploy inflatable motorboats to rescue vulnerable seniors and children.',
+    visualHint: 'Residents gather safely on 2nd-floor balconies as SAR rescue boats navigate the flooded street.'
+  },
+  {
+    id: 'RECEDING_WATER',
+    title: 'Floodwaters Receding & Sanitization',
+    subtitle: 'Mud Removal, Disinfection & Recovery',
+    pvmbgLevel: 'Post-Disaster Recovery',
+    pvmbgColor: '#22c55e',
+    icon: Wind,
+    description: 'Drainage pumps run at full capacity and floodwaters recede, leaving thick mud sediment. Residents clean properties, exercising caution against waterborne diseases.',
+    visualHint: 'Water recedes back into drainage channels, mud cleanup begins, and environmental sanitization starts.'
+  }
+];
+
 interface SimulationOverlayProps {
   disasterId: DisasterId;
   isSimulating: boolean;
@@ -504,7 +944,7 @@ interface SimulationOverlayProps {
 export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
   disasterId,
   isSimulating,
-  onToggleSimulate,
+  onToggleSimulate: _onToggleSimulate,
   onExit,
   onAddXp,
   onOpenDetails,
@@ -523,8 +963,9 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
   showCutaway = true,
   onToggleCutaway
 }) => {
-  const scenario = SIMULATION_SCENARIOS[disasterId];
-  const data = DISASTERS_DATA[disasterId];
+  const { language, t } = useLanguage();
+  const scenario = getSimulationScenario(disasterId, language);
+  const data = getDisaster(disasterId, language);
 
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
@@ -585,11 +1026,23 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
     setIsMinimized(false);
   };
 
+  const handleSpeakText = (text: string) => {
+    soundEngine.speak(text, language);
+  };
+
   const selectedOption = currentStep?.options.find(o => o.id === selectedOptionId);
+
+  // Stage Lists based on current active language
+  const tornadoStages = language === 'en' ? TORNADO_STAGES_EN : TORNADO_STAGES_ID;
+  const landslideStages = language === 'en' ? LANDSLIDE_STAGES_EN : LANDSLIDE_STAGES_ID;
+  const earthquakeStages = language === 'en' ? EARTHQUAKE_STAGES_EN : EARTHQUAKE_STAGES_ID;
+  const volcanoStages = language === 'en' ? ERUPTION_STAGES_EN : ERUPTION_STAGES_ID;
+  const tsunamiStages = language === 'en' ? TSUNAMI_STAGES_EN : TSUNAMI_STAGES_ID;
+  const floodStages = language === 'en' ? FLOOD_STAGES_EN : FLOOD_STAGES_ID;
 
   // Landslide Stage Navigation Handlers
   const isLandslide = disasterId === 'LANDSLIDE' && landslideStage !== undefined && onSetLandslideStage;
-  const currentLandslideStageData = isLandslide ? LANDSLIDE_STAGES[landslideStage!] : null;
+  const currentLandslideStageData = isLandslide ? landslideStages[landslideStage!] : null;
 
   const handleLandslidePrev = () => {
     if (!isLandslide || landslideStage === undefined || landslideStage <= 0) return;
@@ -605,7 +1058,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
 
   // Earthquake Stage Navigation Handlers
   const isEarthquake = disasterId === 'EARTHQUAKE' && earthquakeStage !== undefined && onSetEarthquakeStage;
-  const currentEarthquakeStageData = isEarthquake ? EARTHQUAKE_STAGES[earthquakeStage!] : null;
+  const currentEarthquakeStageData = isEarthquake ? earthquakeStages[earthquakeStage!] : null;
 
   const handleEarthquakePrev = () => {
     if (!isEarthquake || earthquakeStage === undefined || earthquakeStage <= 0) return;
@@ -621,7 +1074,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
 
   // Volcano Stage Navigation Handlers
   const isVolcano = disasterId === 'VOLCANO' && volcanoStage !== undefined && onSetVolcanoStage;
-  const currentVolcanoStageData = isVolcano ? ERUPTION_STAGES[volcanoStage!] : null;
+  const currentVolcanoStageData = isVolcano ? volcanoStages[volcanoStage!] : null;
 
   const handleVolcanoPrev = () => {
     if (!isVolcano || volcanoStage === undefined || volcanoStage <= 0) return;
@@ -637,7 +1090,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
 
   // Tsunami Stage Navigation Handlers
   const isTsunami = disasterId === 'TSUNAMI' && tsunamiStage !== undefined && onSetTsunamiStage;
-  const currentTsunamiStageData = isTsunami ? TSUNAMI_STAGES[tsunamiStage!] : null;
+  const currentTsunamiStageData = isTsunami ? tsunamiStages[tsunamiStage!] : null;
 
   const handleTsunamiPrev = () => {
     if (!isTsunami || tsunamiStage === undefined || tsunamiStage <= 0) return;
@@ -653,7 +1106,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
 
   // Flood Stage Navigation Handlers
   const isFlood = disasterId === 'FLOOD' && floodStage !== undefined && onSetFloodStage;
-  const currentFloodStageData = isFlood ? FLOOD_STAGES[floodStage!] : null;
+  const currentFloodStageData = isFlood ? floodStages[floodStage!] : null;
 
   const handleFloodPrev = () => {
     if (!isFlood || floodStage === undefined || floodStage <= 0) return;
@@ -669,7 +1122,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
 
   // Tornado Stage Navigation Handlers
   const isTornado = disasterId === 'TORNADO' && tornadoStage !== undefined && onSetTornadoStage;
-  const currentTornadoStageData = isTornado ? TORNADO_STAGES[tornadoStage!] : null;
+  const currentTornadoStageData = isTornado ? tornadoStages[tornadoStage!] : null;
 
   const handleTornadoPrev = () => {
     if (!isTornado || tornadoStage === undefined || tornadoStage <= 0) return;
@@ -712,17 +1165,17 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
     : undefined;
 
   const stagesList = isLandslide
-    ? LANDSLIDE_STAGES
+    ? landslideStages
     : isEarthquake
-    ? EARTHQUAKE_STAGES
+    ? earthquakeStages
     : isVolcano 
-    ? ERUPTION_STAGES 
+    ? volcanoStages 
     : isTsunami 
-    ? TSUNAMI_STAGES 
+    ? tsunamiStages 
     : isFlood 
-    ? FLOOD_STAGES 
+    ? floodStages 
     : isTornado
-    ? TORNADO_STAGES
+    ? tornadoStages
     : [];
 
   const handleStagePrev = isLandslide
@@ -775,7 +1228,8 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
             }}
             className="px-2.5 py-1.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-700/80 backdrop-blur-md flex items-center gap-1.5 text-xs font-semibold transition-all shadow-md"
           >
-            <ChevronLeft className="w-3.5 h-3.5" /> Menu Bencana
+            <ChevronLeft className="w-3.5 h-3.5" /> 
+            <span>{language === 'en' ? 'Disaster Modules' : 'Menu Bencana'}</span>
           </button>
 
           {/* Fixed 2D HUD Button: Tampilkan / Sembunyikan Proses (Cutaway / X-Ray) */}
@@ -790,17 +1244,17 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                   ? 'bg-amber-600 text-white border-amber-500 hover:bg-amber-500'
                   : 'bg-zinc-900/90 text-zinc-300 hover:text-white border-zinc-700 hover:bg-zinc-800'
               }`}
-              title={showCutaway ? 'Sembunyikan visualisasi proses internal/cutaway 3D' : 'Tampilkan visualisasi proses internal/cutaway 3D'}
+              title={showCutaway ? (language === 'en' ? 'Hide internal 3D cutaway visualization' : 'Sembunyikan visualisasi proses internal/cutaway 3D') : (language === 'en' ? 'Show internal 3D cutaway visualization' : 'Tampilkan visualisasi proses internal/cutaway 3D')}
             >
               {showCutaway ? (
                 <>
                   <Eye className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Sembunyikan Proses</span>
+                  <span>{language === 'en' ? 'Hide Cutaway' : 'Sembunyikan Proses'}</span>
                 </>
               ) : (
                 <>
                   <EyeOff className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Tampilkan Proses</span>
+                  <span>{language === 'en' ? 'Show Cutaway' : 'Tampilkan Proses'}</span>
                 </>
               )}
             </button>
@@ -829,7 +1283,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
               onOpenDetails();
             }}
             className="w-8 h-8 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 text-emerald-400 border border-zinc-700 backdrop-blur-md transition-colors shadow-sm flex items-center justify-center"
-            title="Buka Materi Edukasi Lengkap"
+            title={language === 'en' ? 'Open Scientific Educational Guide' : 'Buka Materi Edukasi Lengkap'}
           >
             <Info className="w-3.5 h-3.5" />
           </button>
@@ -837,7 +1291,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* VOLCANO / TSUNAMI / FLOOD / EARTHQUAKE / LANDSLIDE PROCESS STAGE NAVIGATOR — Bottom Left Panel */}
+      {/* PROCESS STAGE NAVIGATOR — Bottom Left Panel */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {(isVolcano || isTsunami || isFlood || isEarthquake || isLandslide || isTornado) && activeStageData && (
         <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 max-w-[calc(100%-1.5rem)] sm:max-w-[340px] z-30 pointer-events-auto">
@@ -853,7 +1307,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 className="w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: activeStageData.pvmbgColor }}
               />
-              <span>Tahap {activeStageIndex !== undefined ? activeStageIndex + 1 : 1}: {activeStageData.title}</span>
+              <span>{t('simulation.stageLabel')} {activeStageIndex !== undefined ? activeStageIndex + 1 : 1}: {activeStageData.title}</span>
               <Maximize2 className="w-3.5 h-3.5 text-zinc-400" />
             </button>
           ) : (
@@ -878,7 +1332,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                     </div>
                     <div className="min-w-0">
                       <div className="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400">
-                        Tahap {activeStageIndex !== undefined ? activeStageIndex + 1 : 1} dari 7
+                        {t('simulation.stageLabel')} {activeStageIndex !== undefined ? activeStageIndex + 1 : 1} {t('simulation.of')} 7
                       </div>
                       <div className="text-xs font-bold text-white leading-tight truncate">
                         {activeStageData.title}
@@ -906,7 +1360,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                         setIsStageMinimized(true);
                       }}
                       className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
-                      title="Sembunyikan Panel Tahap"
+                      title={language === 'en' ? 'Minimize Stage Panel' : 'Sembunyikan Panel Tahap'}
                     >
                       <Minimize2 className="w-3.5 h-3.5" />
                     </button>
@@ -914,9 +1368,18 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 </div>
 
                 {/* Subtitle / Scientific explanation */}
-                <div className="text-[10px] font-semibold text-zinc-400 mb-2 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: activeStageData.pvmbgColor }} />
-                  <span className="truncate">{activeStageData.subtitle}</span>
+                <div className="text-[10px] font-semibold text-zinc-400 mb-2 flex items-center justify-between gap-1.5">
+                  <div className="flex items-center gap-1.5 min-w-0 truncate">
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: activeStageData.pvmbgColor }} />
+                    <span className="truncate">{activeStageData.subtitle}</span>
+                  </div>
+                  <button
+                    onClick={() => handleSpeakText(`${activeStageData.title}. ${activeStageData.description}`)}
+                    className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-emerald-400 transition-colors shrink-0"
+                    title={language === 'en' ? 'Listen to narration' : 'Dengarkan narasi'}
+                  >
+                    <Volume2 className="w-3 h-3" />
+                  </button>
                 </div>
 
                 {/* Description */}
@@ -939,10 +1402,10 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                   onClick={handleStagePrev}
                   disabled={activeStageIndex === undefined || activeStageIndex <= 0}
                   className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-bold text-zinc-300 hover:text-white border border-zinc-700 transition-all flex items-center gap-1 cursor-pointer"
-                  title="Tahap Sebelumnya"
+                  title={language === 'en' ? 'Previous Stage' : 'Tahap Sebelumnya'}
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Sebelumnya</span>
+                  <span className="hidden sm:inline">{language === 'en' ? 'Previous' : 'Sebelumnya'}</span>
                 </button>
 
                 {/* 7 Progress Stage Dots */}
@@ -965,7 +1428,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                             : 'w-1.5 h-1.5 bg-zinc-700 hover:bg-zinc-600'
                         }`}
                         style={isActive ? { backgroundColor: activeStageData.pvmbgColor } : {}}
-                        title={`Pindah ke Tahap ${idx + 1}: ${stg.title}`}
+                        title={`${language === 'en' ? 'Stage' : 'Tahap'} ${idx + 1}: ${stg.title}`}
                       />
                     );
                   })}
@@ -976,9 +1439,9 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                   onClick={handleStageNext}
                   disabled={activeStageIndex === undefined || activeStageIndex >= 6}
                   className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-bold text-zinc-300 hover:text-white border border-zinc-700 transition-all flex items-center gap-1 cursor-pointer"
-                  title="Tahap Selanjutnya"
+                  title={language === 'en' ? 'Next Stage' : 'Tahap Selanjutnya'}
                 >
-                  <span className="hidden sm:inline">Selanjutnya</span>
+                  <span className="hidden sm:inline">{language === 'en' ? 'Next' : 'Selanjutnya'}</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -1002,14 +1465,16 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
               <div>
-                <div className="text-[9px] uppercase font-bold text-emerald-400 tracking-wider">Misi Berlangsung</div>
+                <div className="text-[9px] uppercase font-bold text-emerald-400 tracking-wider">
+                  {language === 'en' ? 'Active Mission' : 'Misi Berlangsung'}
+                </div>
                 <div className="text-[11px] font-bold text-zinc-200 group-hover:text-white truncate max-w-[180px] sm:max-w-[220px]">
                   {scenario.title}
                 </div>
               </div>
             </div>
 
-            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition-all flex items-center justify-center shrink-0" title="Buka Pertanyaan">
+            <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 transition-all flex items-center justify-center shrink-0" title={language === 'en' ? 'Open Question' : 'Buka Pertanyaan'}>
               <Maximize2 className="w-4 h-4" />
             </div>
           </div>
@@ -1020,7 +1485,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider">
                 <AlertOctagon className="w-4 h-4" />
-                <span>Skenario Tanggap Darurat</span>
+                <span>{language === 'en' ? 'Emergency Response Scenario' : 'Skenario Tanggap Darurat'}</span>
               </div>
               <button
                 onClick={() => {
@@ -1028,7 +1493,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                   setIsMinimized(true);
                 }}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-zinc-800 transition-colors"
-                title="Minimalkan panel untuk melihat 3D penuh"
+                title={language === 'en' ? 'Minimize panel to view full 3D environment' : 'Minimalkan panel untuk melihat 3D penuh'}
               >
                 <Minimize2 className="w-4 h-4" />
               </button>
@@ -1042,16 +1507,14 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
             
             <div className="text-[11px] font-semibold text-amber-300 mb-4 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-              <span>Misi: {scenario.objective}</span>
+              <span>{language === 'en' ? 'Objective:' : 'Misi:'} {scenario.objective}</span>
             </div>
 
-            {/* Volcano, Tsunami, Flood, Earthquake & Landslide specific hint */}
-            {(isVolcano || isTsunami || isFlood || isEarthquake || isLandslide) && (
-              <div className="text-[11px] text-emerald-300/80 bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/20 mb-4 flex items-start gap-2">
-                <Waves className="w-3.5 h-3.5 shrink-0 mt-0.5" />
-                <span>Gunakan panel <strong>Tahap Bencana</strong> di kiri bawah untuk melihat proses terjadinya bencana secara bertahap.</span>
-              </div>
-            )}
+            {/* Hint for stage exploration */}
+            <div className="text-[11px] text-emerald-300/80 bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-500/20 mb-4 flex items-start gap-2">
+              <Waves className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+              <span>{language === 'en' ? 'Use the bottom-left Disaster Stages panel to examine the step-by-step physical progression.' : 'Gunakan panel Tahap Bencana di kiri bawah untuk melihat proses terjadinya bencana secara bertahap.'}</span>
+            </div>
 
             <div className="flex gap-2">
               <button
@@ -1062,7 +1525,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 className="px-3 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-slate-300 text-xs font-bold border border-zinc-800 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Eye className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Lihat Lingkungan 3D</span>
+                <span>{language === 'en' ? 'Inspect 3D Scene' : 'Lihat Lingkungan 3D'}</span>
               </button>
 
               <button
@@ -1072,7 +1535,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 }}
                 className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md flex items-center justify-center gap-1.5 transition-all"
               >
-                <span>Mulai Pertanyaan</span>
+                <span>{language === 'en' ? 'Start Checkpoints' : 'Mulai Pertanyaan'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -1083,16 +1546,20 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
             <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-emerald-500 flex items-center justify-center mx-auto mb-3 text-emerald-400 shadow-sm">
               <Sparkles className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-black text-white mb-1">Simulasi Selesai!</h3>
+            <h3 className="text-xl font-black text-white mb-1">
+              {language === 'en' ? 'Simulation Completed!' : 'Simulasi Selesai!'}
+            </h3>
             <p className="text-xs text-slate-300 mb-5 leading-relaxed">
-              Respon tanggap darurat Anda untuk bencana {data.indonesianName} telah dievaluasi dengan baik.
+              {language === 'en' 
+                ? `Your emergency mitigation decisions for ${data.name} have been evaluated successfully.` 
+                : `Respon tanggap darurat Anda untuk bencana ${data.indonesianName} telah dievaluasi dengan baik.`}
             </p>
             <div className="flex gap-2.5 justify-center">
               <button
                 onClick={handleRestart}
                 className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold flex items-center justify-center gap-1.5 border border-zinc-800"
               >
-                <RotateCcw className="w-3.5 h-3.5" /> Ulangi
+                <RotateCcw className="w-3.5 h-3.5" /> {language === 'en' ? 'Restart' : 'Ulangi'}
               </button>
               <button
                 onClick={() => {
@@ -1101,7 +1568,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 }}
                 className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-lg shadow-emerald-600/30"
               >
-                Pilih Modul Lain
+                {language === 'en' ? 'Other Modules' : 'Pilih Modul Lain'}
               </button>
             </div>
           </div>
@@ -1109,18 +1576,29 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
           <div className="bg-zinc-950/95 border border-zinc-800 rounded-2xl p-3.5 sm:p-4 shadow-xl backdrop-blur-xl max-h-[75vh] overflow-y-auto custom-scrollbar">
             {/* Step Question & Action Options */}
             <div className="flex items-center justify-between mb-1.5 text-xs font-semibold text-zinc-400">
-              <span className="text-emerald-400 font-mono text-[10px]">LANGKAH {currentStepIndex + 1} DARI {scenario.steps.length}</span>
-              <button
-                onClick={() => {
-                  soundEngine.playClick();
-                  setIsMinimized(true);
-                }}
-                className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors flex items-center gap-1 text-[10px]"
-                title="Minimalkan pertanyaan untuk melihat objek 3D"
-              >
-                <Minimize2 className="w-3 h-3" />
-                <span>Sembunyikan</span>
-              </button>
+              <span className="text-emerald-400 font-mono text-[10px]">
+                {language === 'en' ? 'STEP' : 'LANGKAH'} {currentStepIndex + 1} {t('simulation.of').toUpperCase()} {scenario.steps.length}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleSpeakText(currentStep.instruction)}
+                  className="p-1 rounded hover:bg-zinc-800 text-zinc-400 hover:text-emerald-400 transition-colors"
+                  title={language === 'en' ? 'Listen to question' : 'Dengarkan pertanyaan'}
+                >
+                  <Volume2 className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => {
+                    soundEngine.playClick();
+                    setIsMinimized(true);
+                  }}
+                  className="p-1 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors flex items-center gap-1 text-[10px]"
+                  title={language === 'en' ? 'Minimize question to inspect 3D scene' : 'Minimalkan pertanyaan untuk melihat objek 3D'}
+                >
+                  <Minimize2 className="w-3 h-3" />
+                  <span>{language === 'en' ? 'Hide' : 'Sembunyikan'}</span>
+                </button>
+              </div>
             </div>
 
             <h4 className="text-xs sm:text-sm font-bold text-white mb-2.5 leading-snug">
@@ -1174,7 +1652,9 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 )}
                 <div>
                   <div className="text-[10px] font-bold mb-0.5">
-                    {selectedOption.isCorrect ? 'Keputusan Tepat! (+50 XP)' : 'Peringatan Bahaya!'}
+                    {selectedOption.isCorrect 
+                      ? (language === 'en' ? 'Excellent Decision! (+XP)' : 'Keputusan Tepat! (+50 XP)') 
+                      : (language === 'en' ? 'Critical Hazard Warning!' : 'Peringatan Bahaya!')}
                   </div>
                   <p className="text-[10px] leading-relaxed text-zinc-300">
                     {selectedOption.feedback}
@@ -1187,9 +1667,13 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
             {selectedOptionId && (
               <button
                 onClick={handleNextStep}
-                className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                className="w-full py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-colors cursor-pointer"
               >
-                <span>{currentStepIndex + 1 < scenario.steps.length ? 'Lanjut Langkah Berikutnya' : 'Selesaikan Simulasi'}</span>
+                <span>
+                  {currentStepIndex + 1 < scenario.steps.length 
+                    ? (language === 'en' ? 'Proceed to Next Step' : 'Lanjut Langkah Berikutnya') 
+                    : (language === 'en' ? 'Finish Simulation' : 'Selesaikan Simulasi')}
+                </span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}
@@ -1200,7 +1684,9 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
       {/* Bottom Center Navigation Helper */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none hidden sm:block">
         <span className="text-[10px] text-slate-400 bg-slate-950/75 px-3 py-1 rounded-full border border-slate-800/80 backdrop-blur-md">
-          Klik & seret mouse untuk memutar kamera 3D • Scroll untuk zoom
+          {language === 'en' 
+            ? 'Click & drag mouse to rotate 3D camera • Scroll to zoom' 
+            : 'Klik & seret mouse untuk memutar kamera 3D • Scroll untuk zoom'}
         </span>
       </div>
     </div>

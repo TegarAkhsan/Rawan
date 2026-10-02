@@ -9,9 +9,11 @@ import {
   Layers,
   Menu,
   X,
-  Home
+  Home,
+  Languages
 } from 'lucide-react';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 
 interface NavbarProps {
   currentView: string;
@@ -30,6 +32,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAccessibility,
   userXp = 0
 }) => {
+  const { language, toggleLanguage, t } = useLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [volume, setVolume] = useState(0.5);
@@ -62,11 +65,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div className="flex items-center gap-1">
             <span className="text-base sm:text-lg font-black tracking-tight text-white">RAWAN</span>
           </div>
-          <p className="text-[9px] text-zinc-400 tracking-wide hidden sm:block leading-none">Ruang Antisipasi Waspada Anak Nusantara</p>
+          <p className="text-[9px] text-zinc-400 tracking-wide hidden sm:block leading-none">
+            {t('nav.brandTagline')}
+          </p>
         </div>
       </div>
 
-      {/* Main Desktop Navigation Links (Centered mathematically on viewport) */}
+      {/* Main Desktop Navigation Links */}
       <nav className="hidden lg:flex items-center gap-1 bg-zinc-950 p-0.5 rounded-lg border border-zinc-800 lg:absolute lg:left-1/2 lg:-translate-x-1/2">
         <button
           onClick={() => handleNav('HOME')}
@@ -74,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             currentView === 'HOME' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
           }`}
         >
-          <Home className="w-3.5 h-3.5" /> Beranda
+          <Home className="w-3.5 h-3.5" /> {t('nav.home')}
         </button>
 
         <button
@@ -83,7 +88,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             currentView === 'MODULES' || currentView === 'SIMULATION' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
           }`}
         >
-          <Layers className="w-3.5 h-3.5" /> Modul Bencana
+          <Layers className="w-3.5 h-3.5" /> {t('nav.modules')}
         </button>
 
         <button
@@ -92,7 +97,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             currentView === 'MAP' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
           }`}
         >
-          <MapPin className="w-3.5 h-3.5" /> Peta Bencana
+          <MapPin className="w-3.5 h-3.5" /> {t('nav.map')}
         </button>
 
         <button
@@ -101,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             currentView === 'CHECKLIST' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
           }`}
         >
-          <PackageCheck className="w-3.5 h-3.5" /> Tas Siaga
+          <PackageCheck className="w-3.5 h-3.5" /> {t('nav.checklist')}
         </button>
 
         <button
@@ -110,12 +115,30 @@ export const Navbar: React.FC<NavbarProps> = ({
             currentView === 'QUIZ' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
           }`}
         >
-          <Award className="w-3.5 h-3.5" /> Kuis & Ujian
+          <Award className="w-3.5 h-3.5" /> {t('nav.quiz')}
         </button>
       </nav>
 
-      {/* Right Controls: Sound, Accessibility & Mobile Menu Toggle */}
+      {/* Right Controls: Language Switcher, Sound, Accessibility & Mobile Menu Toggle */}
       <div className="flex items-center gap-2">
+        
+        {/* Language Switcher Pill Toggle */}
+        <button
+          onClick={() => {
+            soundEngine.playClick();
+            toggleLanguage();
+          }}
+          className="h-8 px-2.5 rounded-lg bg-zinc-900 border border-zinc-700/80 hover:border-emerald-500/60 text-xs font-bold text-zinc-200 hover:text-white hover:bg-zinc-800 transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
+          title={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
+        >
+          <Languages className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="flex items-center gap-1">
+            <span className={language === 'id' ? 'text-emerald-400 font-extrabold' : 'text-zinc-500'}>ID</span>
+            <span className="text-zinc-600 font-normal">|</span>
+            <span className={language === 'en' ? 'text-emerald-400 font-extrabold' : 'text-zinc-500'}>EN</span>
+          </span>
+        </button>
+
         {/* Sound Toggle with Volume Popover */}
         <div className="relative">
           <button
@@ -126,10 +149,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             onMouseEnter={() => setShowVolumeSlider(true)}
             className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all ${
               soundEnabled
-                ? 'bg-emerald-600 border-emerald-500 text-white'
+                ? 'bg-emerald-600 border-emerald-500 text-white shadow-sm'
                 : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
             }`}
-            title={soundEnabled ? "Nonaktifkan Suara" : "Aktifkan Suara"}
+            title={soundEnabled ? t('nav.soundOff') : t('nav.soundOn')}
           >
             {soundEnabled ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </button>
@@ -164,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onOpenAccessibility();
           }}
           className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-all flex items-center justify-center"
-          title="Pengaturan Aksesibilitas"
+          title={t('nav.accessibility')}
         >
           <Settings className="w-3.5 h-3.5" />
         </button>
@@ -199,7 +222,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 currentView === 'HOME' ? 'bg-emerald-600 text-white' : 'text-zinc-300 hover:text-white hover:bg-zinc-900 active:bg-zinc-800'
               }`}
             >
-              <Home className="w-4 h-4" /> Beranda
+              <Home className="w-4 h-4" /> {t('nav.home')}
             </button>
 
             <button
@@ -208,7 +231,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 currentView === 'MODULES' || currentView === 'SIMULATION' ? 'bg-emerald-600 text-white' : 'text-zinc-300 hover:text-white hover:bg-zinc-900 active:bg-zinc-800'
               }`}
             >
-              <Layers className="w-4 h-4" /> Modul Bencana
+              <Layers className="w-4 h-4" /> {t('nav.modules')}
             </button>
 
             <button
@@ -217,7 +240,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 currentView === 'MAP' ? 'bg-emerald-600 text-white' : 'text-zinc-300 hover:text-white hover:bg-zinc-900 active:bg-zinc-800'
               }`}
             >
-              <MapPin className="w-4 h-4" /> Peta Bencana
+              <MapPin className="w-4 h-4" /> {t('nav.map')}
             </button>
 
             <button
@@ -226,7 +249,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 currentView === 'CHECKLIST' ? 'bg-emerald-600 text-white' : 'text-zinc-300 hover:text-white hover:bg-zinc-900 active:bg-zinc-800'
               }`}
             >
-              <PackageCheck className="w-4 h-4" /> Tas Siaga Bencana
+              <PackageCheck className="w-4 h-4" /> {t('nav.checklist')}
             </button>
 
             <button
@@ -235,8 +258,40 @@ export const Navbar: React.FC<NavbarProps> = ({
                 currentView === 'QUIZ' ? 'bg-emerald-600 text-white' : 'text-zinc-300 hover:text-white hover:bg-zinc-900 active:bg-zinc-800'
               }`}
             >
-              <Award className="w-4 h-4" /> Kuis & Ujian
+              <Award className="w-4 h-4" /> {t('nav.quiz')}
             </button>
+
+            {/* Mobile Language Switcher */}
+            <div className="pt-2 mt-2 border-t border-zinc-800 flex items-center justify-between px-2">
+              <span className="text-xs font-medium text-zinc-400 flex items-center gap-2">
+                <Languages className="w-4 h-4 text-emerald-400" />
+                {t('accessibility.languageSection')}
+              </span>
+              <div className="flex gap-1 bg-zinc-900 p-1 rounded-lg border border-zinc-800">
+                <button
+                  onClick={() => {
+                    soundEngine.playClick();
+                    if (language !== 'id') toggleLanguage();
+                  }}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${
+                    language === 'id' ? 'bg-emerald-600 text-white' : 'text-zinc-400'
+                  }`}
+                >
+                  🇮🇩 ID
+                </button>
+                <button
+                  onClick={() => {
+                    soundEngine.playClick();
+                    if (language !== 'en') toggleLanguage();
+                  }}
+                  className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${
+                    language === 'en' ? 'bg-emerald-600 text-white' : 'text-zinc-400'
+                  }`}
+                >
+                  🇬🇧 EN
+                </button>
+              </div>
+            </div>
           </div>
         </>
       )}

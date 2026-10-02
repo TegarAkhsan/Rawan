@@ -15,8 +15,9 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { DisasterId } from '../types/disaster';
-import { DISASTERS_DATA } from '../data/disasterData';
+import { getDisaster } from '../data/disasterData';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 
 interface DisasterDetailModalProps {
   disasterId: DisasterId | null;
@@ -33,18 +34,19 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
   onStartSimulation,
   onStartQuiz
 }) => {
+  const { language, t } = useLanguage();
   if (!disasterId) return null;
-  const data = DISASTERS_DATA[disasterId];
+  const data = getDisaster(disasterId, language);
   const [activeTab, setActiveTab] = useState<TabType>('causes');
   const [isSpeaking, setIsSpeaking] = useState(false);
 
   const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
-    { id: 'causes', label: 'Penyebab', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'signs', label: 'Tanda Peringatan', icon: <Activity className="w-4 h-4" /> },
-    { id: 'impacts', label: 'Dampak Bahaya', icon: <Flame className="w-4 h-4" /> },
-    { id: 'prevention', label: 'Mitigasi & Solusi', icon: <ShieldCheck className="w-4 h-4" /> },
-    { id: 'emergency', label: 'Prosedur Darurat', icon: <AlertTriangle className="w-4 h-4" /> },
-    { id: 'evacuation', label: 'Jalur Evakuasi', icon: <Compass className="w-4 h-4" /> },
+    { id: 'causes', label: t('detailModal.tabCauses'), icon: <BookOpen className="w-4 h-4" /> },
+    { id: 'signs', label: t('detailModal.tabSigns'), icon: <Activity className="w-4 h-4" /> },
+    { id: 'impacts', label: t('detailModal.tabImpacts'), icon: <Flame className="w-4 h-4" /> },
+    { id: 'prevention', label: t('detailModal.tabEmergency'), icon: <ShieldCheck className="w-4 h-4" /> },
+    { id: 'emergency', label: t('detailModal.tabEmergency'), icon: <AlertTriangle className="w-4 h-4" /> },
+    { id: 'evacuation', label: t('detailModal.tabEvacuation'), icon: <Compass className="w-4 h-4" /> },
   ];
 
   const handleSpeech = (text: string) => {
@@ -52,7 +54,7 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
       soundEngine.stopSpeaking();
       setIsSpeaking(false);
     } else {
-      soundEngine.speakIndonesian(text);
+      soundEngine.speak(text, language);
       setIsSpeaking(true);
     }
   };
@@ -69,6 +71,7 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
   };
 
   const currentSection = getCurrentSection();
+  const displayName = language === 'en' ? data.name : data.indonesianName;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 md:p-8 bg-black/85 backdrop-blur-md animate-in fade-in">
@@ -91,9 +94,11 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
                 <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-zinc-900 text-slate-300 border border-zinc-700">
                   {data.category}
                 </span>
-                <span className="text-[10px] sm:text-xs font-mono text-emerald-400 font-semibold hidden sm:inline">MODUL EDUKASI 3D</span>
+                <span className="text-[10px] sm:text-xs font-mono text-emerald-400 font-semibold hidden sm:inline">
+                  {t('detailModal.scientificGuide')}
+                </span>
               </div>
-              <h2 className="text-lg sm:text-2xl md:text-3xl font-black text-white truncate">{data.indonesianName}</h2>
+              <h2 className="text-lg sm:text-2xl md:text-3xl font-black text-white truncate">{displayName}</h2>
               <p className="text-[11px] sm:text-xs md:text-sm text-slate-400 mt-0.5 truncate">{data.subtitle}</p>
             </div>
           </div>
@@ -101,13 +106,13 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
           <div className="flex items-center gap-1.5 sm:gap-2 z-10 shrink-0">
             {/* Audio Reader Button */}
             <button
-              onClick={() => handleSpeech(`${data.indonesianName}. ${currentSection.title}. ${currentSection.summary}. ${currentSection.points.join('. ')}`)}
+              onClick={() => handleSpeech(`${displayName}. ${currentSection.title}. ${currentSection.summary}. ${currentSection.points.join('. ')}`)}
               className={`p-2 sm:p-2.5 rounded-xl border transition-all ${
                 isSpeaking 
                   ? 'bg-emerald-500 text-slate-950 border-emerald-400 animate-pulse' 
                   : 'bg-zinc-900/80 text-slate-300 border-zinc-750 hover:text-emerald-400'
               }`}
-              title={isSpeaking ? "Hentikan Suara" : "Dengarkan Narasi Audio (Bahasa Indonesia)"}
+              title={isSpeaking ? t('simulation.voiceStop') : t('detailModal.readAloud')}
             >
               <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
@@ -180,7 +185,7 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
               <div>
                 <div className="flex items-center gap-2 text-xs font-bold text-amber-400 mb-2">
                   <History className="w-4 h-4" />
-                  <span>Kilas Sejarah Indonesia ({data.famousEventIndonesia.year})</span>
+                  <span>{t('detailModal.tabCaseStudy')} ({data.famousEventIndonesia.year})</span>
                 </div>
                 <h4 className="text-base font-bold text-white mb-1">{data.famousEventIndonesia.title}</h4>
                 <div className="text-xs text-zinc-400 mb-2 font-medium">{data.famousEventIndonesia.location}</div>
@@ -195,7 +200,7 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
               <div>
                 <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 mb-2">
                   <Sparkles className="w-4 h-4" />
-                  <span>Fakta Sains Unik</span>
+                  <span>{t('detailModal.funFactTitle')}</span>
                 </div>
                 <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mt-2 italic">
                   "{data.funFact}"
@@ -215,7 +220,7 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
             className="w-full sm:w-auto px-6 py-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border border-zinc-800 transition-colors"
           >
             <HelpCircle className="w-4 h-4 text-emerald-400" />
-            Uji Pengetahuan (Kuis)
+            {t('modules.btnTakeQuiz')}
           </button>
 
           <button
@@ -224,10 +229,10 @@ export const DisasterDetailModal: React.FC<DisasterDetailModalProps> = ({
               soundEngine.playClick();
               onStartSimulation(disasterId);
             }}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2.5 shadow-md transition-all"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-black flex items-center justify-center gap-2.5 shadow-md transition-all active:scale-98"
           >
             <Play className="w-4 h-4 fill-white" />
-            Masuk Mode Simulasi 3D
+            {t('detailModal.btnStartSim')}
           </button>
         </div>
       </div>

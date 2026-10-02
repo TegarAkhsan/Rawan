@@ -1,6 +1,7 @@
 import { QuizQuestion } from '../types/disaster';
+import { Language } from '../types/language';
 
-export const QUIZ_QUESTIONS: QuizQuestion[] = [
+export const QUIZ_QUESTIONS_ID: QuizQuestion[] = [
   // Earthquake
   {
     id: 'q_eq_1',
@@ -223,3 +224,233 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     difficulty: 'Sedang'
   }
 ];
+
+export const QUIZ_QUESTIONS_EN: QuizQuestion[] = [
+  // Earthquake
+  {
+    id: 'q_eq_1',
+    disasterId: 'EARTHQUAKE',
+    question: 'When violent earthquake shaking strikes while you are indoors, what is the standard recommended protective action?',
+    options: [
+      'Run in panic looking for the emergency exit',
+      'Drop, Cover, and Hold On (Get low, shield head under sturdy desk, hold on)',
+      'Quickly enter an elevator to rush downstairs',
+      'Stand against large glass windows'
+    ],
+    correctIndex: 1,
+    explanation: 'The Drop, Cover, and Hold On method shields vital organs (head, neck) from falling ceilings, light fixtures, and heavy furniture.',
+    difficulty: 'Mudah'
+  },
+  {
+    id: 'q_eq_2',
+    disasterId: 'EARTHQUAKE',
+    question: 'The phenomenon where water-saturated sandy soil loses its structural shear strength during seismic shaking and behaves like liquid mud is called...',
+    options: [
+      'Sedimentation',
+      'Soil Liquefaction',
+      'Glacial Erosion',
+      'Tectonic Subsidence'
+    ],
+    correctIndex: 1,
+    explanation: 'Liquefaction occurs when pore water pressure surges during intense shaking, causing the ground to lose load-bearing capacity (as observed in Palu 2018).',
+    difficulty: 'Sedang'
+  },
+  {
+    id: 'q_eq_3',
+    disasterId: 'EARTHQUAKE',
+    question: 'The active inland strike-slip fault in Java passing north of Bandung monitored closely by geologists is...',
+    options: [
+      'Semangko Fault',
+      'Palu-Koro Fault',
+      'Lembang Fault',
+      'Opak Fault'
+    ],
+    correctIndex: 2,
+    explanation: 'The Lembang Fault is an active fault ~29 km long stretching from Padalarang to Mount Manglayang in West Java.',
+    difficulty: 'Tantangan'
+  },
+
+  // Tsunami
+  {
+    id: 'q_ts_1',
+    disasterId: 'TSUNAMI',
+    question: 'What is the coastal 20-20-20 emergency rule when a strong earthquake is felt near the ocean?',
+    options: [
+      '10-10-10: 10 mins quake, run 10 km, climb 10 meters',
+      '20-20-20: If shaking lasts > 20 secs, you have ~20 mins to evacuate to ≥ 20m elevation',
+      '30-30-30: 30 secs quake, wait 30 mins, climb 30 meters',
+      '5-5-5: 5 secs quake, wait 5 mins, gather 5 people'
+    ],
+    correctIndex: 1,
+    explanation: 'The 20-20-20 rule reminds coastal residents: if ground shaking exceeds 20 seconds, evacuate within 20 minutes to an elevation of at least 20 meters.',
+    difficulty: 'Sedang'
+  },
+  {
+    id: 'q_ts_2',
+    disasterId: 'TSUNAMI',
+    question: 'Why are coastal mangrove forests vital for tsunami mitigation along Indonesian shorelines?',
+    options: [
+      'They provide pleasant scenery for tourism',
+      'Dense root systems can dissipate up to 50-60% of tsunami wave energy and surge height',
+      'They prevent fishing boats from drifting into open sea',
+      'They absorb all sea water completely before reaching land'
+    ],
+    correctIndex: 1,
+    explanation: 'Mangrove green belts act as natural hydraulic wave breakers that absorb and disperse destructive wave momentum.',
+    difficulty: 'Mudah'
+  },
+  {
+    id: 'q_ts_3',
+    disasterId: 'TSUNAMI',
+    question: 'If ocean water suddenly and drastically recedes exposing the seafloor at the beach, what is the correct immediate action?',
+    options: [
+      'Walk onto the seabed to collect stranded fish',
+      'Take photos and record the rare event closely',
+      'Immediately run to higher ground or hills without waiting for siren alarms',
+      'Stay on the shoreline waiting for water to return to normal'
+    ],
+    correctIndex: 2,
+    explanation: 'Drastic ocean withdrawal is a hydraulic warning sign before the arrival of a massive tsunami wave crest. Evacuate to high ground immediately!',
+    difficulty: 'Mudah'
+  },
+
+  // Volcano
+  {
+    id: 'q_vol_1',
+    disasterId: 'VOLCANO',
+    question: 'The incandescent cloud of superheated volcanic gas, ash, and pumice surging down a volcano at high speed is known in Merapi as...',
+    options: [
+      'Cold Lahar',
+      'Wedhus Gembel (Pyroclastic Density Current)',
+      'Pumice Floats',
+      'Thermal Geysers'
+    ],
+    correctIndex: 1,
+    explanation: 'Pyroclastic density currents (wedhus gembel) can reach temperatures between 300°C–700°C and travel downhill at speeds exceeding 200 km/h.',
+    difficulty: 'Mudah'
+  },
+  {
+    id: 'q_vol_2',
+    disasterId: 'VOLCANO',
+    question: 'Why must we wear specialized masks (like N95) and airtight goggles during volcanic ashfall?',
+    options: [
+      'Volcanic ash contains pleasant sulfur aromas',
+      'Volcanic ash consists of microscopic, razor-sharp silica shards that lacerate lung alveoli and corneal tissue',
+      'To keep our clothing from getting stained',
+      'To protect against direct sunlight glare'
+    ],
+    correctIndex: 1,
+    explanation: 'Volcanic ash is pulverized rock and abrasive silica glass shards that cause severe respiratory trauma (silicosis) and corneal abrasion.',
+    difficulty: 'Sedang'
+  },
+  {
+    id: 'q_vol_3',
+    disasterId: 'VOLCANO',
+    question: 'What is the official sequential order of volcanic alert levels in Indonesia by PVMBG from lowest to highest?',
+    options: [
+      'Level I (Normal), Level II (Waspada), Level III (Siaga), Level IV (Awas)',
+      'Safe, Caution, Danger, Critical',
+      'Waspada, Normal, Awas, Siaga',
+      'Green, Yellow, Orange, Red'
+    ],
+    correctIndex: 0,
+    explanation: 'Official Indonesian PVMBG alert levels: Level I (Normal), Level II (Waspada/Advisory), Level III (Siaga/Watch), and Level IV (Awas/Warning).',
+    difficulty: 'Mudah'
+  },
+
+  // Flood
+  {
+    id: 'q_fl_1',
+    disasterId: 'FLOOD',
+    question: 'What is the very first and most critical action when floodwaters begin entering your home?',
+    options: [
+      'Turn on the electric water pump',
+      'Shut off the main electrical breaker (MCB) to prevent lethal electrocution',
+      'Open all doors and windows as wide as possible',
+      'Wash dirty floor furniture'
+    ],
+    correctIndex: 1,
+    explanation: 'Electrocution via submerged wiring and floodwaters is one of the leading causes of preventable fatalities during urban floods.',
+    difficulty: 'Mudah'
+  },
+  {
+    id: 'q_fl_2',
+    disasterId: 'FLOOD',
+    question: 'Which dangerous bacterial disease is transmitted through rodent urine contaminating floodwaters and entering via skin abrasions?',
+    options: [
+      'Leptospirosis',
+      'Malaria',
+      'Tuberculosis',
+      'Rabies'
+    ],
+    correctIndex: 0,
+    explanation: 'Leptospirosis is caused by Leptospira bacteria shed in rodent urine, which penetrates skin lesions in floodwaters and can cause renal failure.',
+    difficulty: 'Sedang'
+  },
+
+  // Landslide
+  {
+    id: 'q_ls_1',
+    disasterId: 'LANDSLIDE',
+    question: 'Which deep-rooted vegetation (with roots penetrating 3-5 meters deep) is officially recommended to reinforce slopes against landslides?',
+    options: [
+      'Banana Tree',
+      'Vetiver Grass (Akar Wangi)',
+      'Paddy Rice',
+      'Desert Cactus'
+    ],
+    correctIndex: 1,
+    explanation: 'Vetiver grass root networks act as bio-engineered living soil anchors that bind soil particles and drastically reduce slope shear failure.',
+    difficulty: 'Sedang'
+  },
+  {
+    id: 'q_ls_2',
+    disasterId: 'LANDSLIDE',
+    question: 'If a massive landslide is surging downhill toward you, what is the best escape trajectory?',
+    options: [
+      'Run straight downhill along the path of falling debris',
+      'Run laterally (perpendicular) away from the debris flow path toward higher ground',
+      'Hide under a wooden shack roof at the slope edge',
+      'Stay stationary and shout for help'
+    ],
+    correctIndex: 1,
+    explanation: 'Lateral evacuation moves you out of the central high-velocity debris avalanche corridor toward safety.',
+    difficulty: 'Mudah'
+  },
+
+  // Tornado
+  {
+    id: 'q_to_1',
+    disasterId: 'TORNADO',
+    question: 'Which towering, anvil-topped storm cloud with violent updrafts typically triggers tornadoes, waterspouts, and hail?',
+    options: [
+      'Cirrus Cloud',
+      'Cumulonimbus Cloud (CB)',
+      'Stratus Cloud',
+      'Altocumulus Cloud'
+    ],
+    correctIndex: 1,
+    explanation: 'Cumulonimbus clouds are massive convective thunderstorm supercells capable of spawning rotating mesocyclones and tornadoes.',
+    difficulty: 'Mudah'
+  },
+  {
+    id: 'q_to_2',
+    disasterId: 'TORNADO',
+    question: 'What is the safest indoor location during a violent tornado or severe windstorm?',
+    options: [
+      'Upper-floor balcony near large glass windows',
+      'Innermost ground-floor room without windows (interior bathroom, hallway, or under a reinforced table)',
+      'Inside an open-door vehicle garage',
+      'Directly under roof shingles'
+    ],
+    correctIndex: 1,
+    explanation: 'An interior windowless ground-floor room puts the maximum number of structural walls between you and flying airborne projectile debris.',
+    difficulty: 'Sedang'
+  }
+];
+
+export const getQuizQuestions = (lang: Language = 'id'): QuizQuestion[] => {
+  return lang === 'en' ? QUIZ_QUESTIONS_EN : QUIZ_QUESTIONS_ID;
+};
+
+export const QUIZ_QUESTIONS = QUIZ_QUESTIONS_ID;

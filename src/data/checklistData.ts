@@ -1,6 +1,7 @@
 import { ChecklistItem } from '../types/disaster';
+import { Language } from '../types/language';
 
-export const CHECKLIST_ITEMS: ChecklistItem[] = [
+export const CHECKLIST_ITEMS_ID: ChecklistItem[] = [
   {
     id: 'tsb_water',
     name: 'Air Minum Bersih (Minimal 3 Liter)',
@@ -101,12 +102,129 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     weightKg: 0.3
   },
   {
-    id: 'tsb_multitool',
-    name: 'Pisau Lipat Serbaguna (Multi-tool)',
-    category: 'Dokumen & Perlindungan',
-    description: 'Membuka kaleng makanan, memotong tali pengikat, atau memperbaiki peralatan darurat.',
-    importance: 'Pelengkap',
-    icon: 'Wrench',
-    weightKg: 0.3
+    id: 'tsb_hygiene',
+    name: 'Perlengkapan Higienis & Sanitasi Pribadi',
+    category: 'Pertolongan & Medis',
+    description: 'Sabun cair, sikat gigi, pasta gigi, tisu basah antiseptik, dan pembalut wanita.',
+    importance: 'Penting',
+    icon: 'Heart',
+    weightKg: 0.4
   }
 ];
+
+export const CHECKLIST_ITEMS_EN: ChecklistItem[] = [
+  {
+    id: 'tsb_water',
+    name: 'Potable Drinking Water (Min. 3 Liters)',
+    category: 'Kebutuhan Pokok',
+    description: 'Essential survival sustenance for the first 72 hours post-disaster.',
+    importance: 'Sangat Wajib',
+    icon: 'Droplet',
+    weightKg: 3.0
+  },
+  {
+    id: 'tsb_food',
+    name: 'Ready-to-Eat Food / Canned Meals / Energy Biscuits',
+    category: 'Kebutuhan Pokok',
+    description: 'High-calorie, non-perishable foods requiring no cooking (dates, wheat biscuits, canned meat).',
+    importance: 'Sangat Wajib',
+    icon: 'Apple',
+    weightKg: 1.5
+  },
+  {
+    id: 'tsb_p3k',
+    name: 'First Aid Kit (P3K) & Prescription Medicines',
+    category: 'Pertolongan & Medis',
+    description: 'Bandages, sterile gauze, antiseptic solution, paracetamol, oral rehydration salts, and personal medications.',
+    importance: 'Sangat Wajib',
+    icon: 'Cross',
+    weightKg: 0.6
+  },
+  {
+    id: 'tsb_flashlight',
+    name: 'Headlamp / LED Flashlight & Spare Batteries',
+    category: 'Komunikasi & Penerangan',
+    description: 'Critical emergency lighting during complete electrical grid blackouts at night.',
+    importance: 'Sangat Wajib',
+    icon: 'Flashlight',
+    weightKg: 0.4
+  },
+  {
+    id: 'tsb_whistle',
+    name: 'High-Decibel Rescue Whistle',
+    category: 'Komunikasi & Penerangan',
+    description: 'The most energy-efficient tool to alert SAR rescue teams if trapped under rubble.',
+    importance: 'Sangat Wajib',
+    icon: 'Volume2',
+    weightKg: 0.1
+  },
+  {
+    id: 'tsb_powerbank',
+    name: 'Fully Charged Power Bank & Multi-Cable',
+    category: 'Komunikasi & Penerangan',
+    description: 'Maintains smartphone power to communicate with family and emergency services.',
+    importance: 'Penting',
+    icon: 'BatteryCharging',
+    weightKg: 0.5
+  },
+  {
+    id: 'tsb_documents',
+    name: 'Vital Documents in Waterproof Pouch',
+    category: 'Dokumen & Perlindungan',
+    description: 'Copies of ID cards, family registry, diplomas, insurance policies in airtight ziplock bags.',
+    importance: 'Sangat Wajib',
+    icon: 'FileText',
+    weightKg: 0.3
+  },
+  {
+    id: 'tsb_cash',
+    name: 'Emergency Cash in Small Denominations',
+    category: 'Dokumen & Perlindungan',
+    description: 'When ATMs lose power and cellular internet drops, cash remains the sole medium of transaction.',
+    importance: 'Penting',
+    icon: 'Coins',
+    weightKg: 0.2
+  },
+  {
+    id: 'tsb_clothes',
+    name: 'Change of Clothes, Thermal Blanket & Raincoat',
+    category: 'Dokumen & Perlindungan',
+    description: 'Protects against hypothermia and wet conditions in emergency evacuation shelters.',
+    importance: 'Penting',
+    icon: 'Shirt',
+    weightKg: 1.2
+  },
+  {
+    id: 'tsb_mask',
+    name: 'N95 / Medical Masks & Protective Goggles',
+    category: 'Pertolongan & Medis',
+    description: 'Shields respiratory tracts and eyes from building debris, sharp volcanic ash, and smoke.',
+    importance: 'Penting',
+    icon: 'Shield',
+    weightKg: 0.2
+  },
+  {
+    id: 'tsb_radio',
+    name: 'Compact Portable FM/AM Radio Receiver',
+    category: 'Komunikasi & Penerangan',
+    description: 'Receives government broadcasts and emergency instructions if cellular towers collapse.',
+    importance: 'Pelengkap',
+    icon: 'Radio',
+    weightKg: 0.3
+  },
+  {
+    id: 'tsb_hygiene',
+    name: 'Personal Hygiene & Sanitation Supplies',
+    category: 'Pertolongan & Medis',
+    description: 'Liquid soap, toothbrush, toothpaste, antiseptic wet wipes, and sanitary pads.',
+    importance: 'Penting',
+    icon: 'Heart',
+    weightKg: 0.4
+  }
+];
+
+export const getChecklistItems = (lang: Language = 'id'): ChecklistItem[] => {
+  return lang === 'en' ? CHECKLIST_ITEMS_EN : CHECKLIST_ITEMS_ID;
+};
+
+export const CHECKLIST_ITEMS = CHECKLIST_ITEMS_ID;
