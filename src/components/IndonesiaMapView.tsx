@@ -539,7 +539,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
 
       {/* Single Line Footer Note */}
       <div className="text-center text-[10px] text-zinc-500 mt-1.5 shrink-0">
-        © 2026 RAWAN • {language === 'en' ? 'Geospatial Disaster Hazard Geoportal & Real-Time BMKG TEWS Telemetry' : 'Geoportal Geospasial Kebencanaan & Monitoring Seismik BMKG TEWS Indonesia'}
+        © 2026 RAWAN ({language === 'en' ? 'Indonesian Youth Disaster Anticipation & Awareness' : 'Ruang Antisipasi Waspada Anak Nusantara'})
       </div>
     </section>
   );

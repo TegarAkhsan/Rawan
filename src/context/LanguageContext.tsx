@@ -328,7 +328,7 @@ export const TRANSLATIONS: Record<Language, Translations> = {
   },
   en: {
     brandName: "RAWAN",
-    brandTagline: "Indonesian Youth Disaster Anticipation & Awareness Platform",
+    brandTagline: "Indonesian Youth Disaster Anticipation & Awareness",
     navHome: "Home",
     navModules: "Disaster Modules",
     navMap: "Hazard Map",

@@ -509,8 +509,8 @@ export const App: React.FC = () => {
             {/* Sleek single line copyright */}
             <div className="text-center text-[10px] text-zinc-500 mt-2.5">
               {isEn
-                ? '© 2026 RAWAN (Indonesian Youth Disaster Anticipation & Awareness) • 3D Disaster Mitigation Education'
-                : '© 2026 RAWAN (Ruang Antisipasi Waspada Anak Nusantara) • Edukasi Mitigasi Kebencanaan 3D'
+                ? '© 2026 RAWAN (Indonesian Youth Disaster Anticipation & Awareness)'
+                : '© 2026 RAWAN (Ruang Antisipasi Waspada Anak Nusantara)'
               }
             </div>
           </div>
