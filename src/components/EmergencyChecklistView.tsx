@@ -64,35 +64,42 @@ export const EmergencyChecklistView: React.FC<EmergencyChecklistViewProps> = () 
     : items.filter(it => it.category === selectedCategory);
 
   const getImportanceBadge = (importance: string) => {
-    switch (importance) {
-      case 'Sangat Wajib':
-        return (
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
-            {t.checkImportanceHigh}
-          </span>
-        );
-      case 'Penting':
-        return (
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
-            {t.checkImportanceMedium}
-          </span>
-        );
-      default:
-        return (
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
-            {t.checkImportanceLow}
-          </span>
-        );
+    if (importance === 'Sangat Wajib' || importance === 'Mandatory') {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+          {t.checkImportanceHigh}
+        </span>
+      );
+    } else if (importance === 'Penting' || importance === 'Important') {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+          {t.checkImportanceMedium}
+        </span>
+      );
+    } else {
+      return (
+        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+          {t.checkImportanceLow}
+        </span>
+      );
     }
   };
 
   const getCategoryLabel = (cat: string) => {
     switch (cat) {
-      case 'Kebutuhan Pokok': return t.checkCatBasic;
-      case 'Pertolongan & Medis': return t.checkCatMedical;
-      case 'Komunikasi & Penerangan': return t.checkCatComm;
-      case 'Dokumen & Perlindungan': return t.checkCatDocs;
+      case 'Kebutuhan Pokok':
+      case 'Basic Needs':
+        return t.checkCatBasic;
+      case 'Pertolongan & Medis':
+      case 'First Aid & Medical':
+        return t.checkCatMedical;
+      case 'Komunikasi & Penerangan':
+      case 'Communication & Lighting':
+        return t.checkCatComm;
+      case 'Dokumen & Perlindungan':
+      case 'Documents & Protection':
+        return t.checkCatDocs;
       default: return cat;
     }
   };

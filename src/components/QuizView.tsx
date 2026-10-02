@@ -166,14 +166,14 @@ export const QuizView: React.FC<QuizViewProps> = ({
   };
 
   const getDifficultyBadge = (diff: string) => {
-    if (diff === 'Mudah') {
+    if (diff === 'Mudah' || diff === 'Easy') {
       return (
         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
           {t.quizDiffEasy}
         </span>
       );
     }
-    if (diff === 'Sedang') {
+    if (diff === 'Sedang' || diff === 'Medium') {
       return (
         <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
           {t.quizDiffMedium}
@@ -301,7 +301,7 @@ export const QuizView: React.FC<QuizViewProps> = ({
                   <span className="text-xs font-bold text-slate-300">
                     {currentDisasterData 
                       ? (language === 'en' ? currentDisasterData.name : currentDisasterData.indonesianName)
-                      : 'Umum'}
+                      : (language === 'en' ? 'General' : 'Umum')}
                   </span>
                   {getDifficultyBadge(currentQ.difficulty)}
                 </div>

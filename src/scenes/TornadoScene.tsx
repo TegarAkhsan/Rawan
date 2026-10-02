@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Wind, 
   AlertTriangle, 
@@ -736,6 +737,9 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
   onActionClick,
   showCutaway: externalCutaway
 }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
   const [internalShowCutaway] = useState(true);
   const showCutaway = externalCutaway !== undefined ? externalCutaway : internalShowCutaway;
 
@@ -1405,7 +1409,7 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
             <Html position={[0, 7.2, 0]} center distanceFactor={14}>
               <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-amber-500 text-amber-200 text-[11px] font-bold shadow-md whitespace-nowrap pointer-events-none">
                 <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                <span>Dinding Awan Mesosiklon (Rotating Wall Cloud)</span>
+                <span>{isEn ? 'Rotating Mesocyclone Wall Cloud' : 'Dinding Awan Mesosiklon (Rotating Wall Cloud)'}</span>
               </div>
             </Html>
           )}
@@ -1415,7 +1419,7 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
             <Html position={[-1.2, 4.2, 0]} center distanceFactor={14}>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-900 border border-rose-600 text-white text-[11px] font-bold shadow-md whitespace-nowrap pointer-events-none">
                 <Wind className="w-3.5 h-3.5 text-rose-400" />
-                <span>Pusaran Puting Beliung (Funnel Cloud EF-3)</span>
+                <span>{isEn ? 'Tornado Vortex (Funnel Cloud EF-3)' : 'Pusaran Puting Beliung (Funnel Cloud EF-3)'}</span>
               </div>
             </Html>
           )}
@@ -1424,7 +1428,7 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
           <Html position={[-6.0, 2.8, -4.6]} center distanceFactor={13}>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-900 border border-emerald-500 text-emerald-200 text-[11px] font-bold shadow-md whitespace-nowrap pointer-events-none">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Ruang Aman Tengah (Interior Safe Room)</span>
+              <span>{isEn ? 'Interior Safe Room / Core Shelter' : 'Ruang Aman Tengah (Interior Safe Room)'}</span>
             </div>
           </Html>
 
@@ -1433,7 +1437,7 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
             <Html position={[0.5, 2.4, -4.6]} center distanceFactor={13}>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-900 border border-rose-500 text-rose-200 text-[11px] font-bold shadow-md whitespace-nowrap pointer-events-none">
                 <AlertOctagon className="w-3.5 h-3.5 text-rose-400" />
-                <span>Zona Kerusakan Parah & Atap Seng Robek</span>
+                <span>{isEn ? 'Severe Structural Damage & Roof Debris' : 'Zona Kerusakan Parah & Atap Seng Robek'}</span>
               </div>
             </Html>
           )}
@@ -1443,7 +1447,7 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
             <Html position={[-4.0, 1.8, 0.4]} center distanceFactor={13}>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-900 border border-amber-500 text-amber-200 text-[11px] font-bold shadow-md whitespace-nowrap pointer-events-none">
                 <Truck className="w-3.5 h-3.5 text-amber-400" />
-                <span>Posko Evakuasi & Tim SAR BPBD</span>
+                <span>{isEn ? 'Emergency Evacuation Base & SAR Units' : 'Posko Evakuasi & Tim SAR BPBD'}</span>
               </div>
             </Html>
           )}
@@ -1453,7 +1457,7 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
             <Html position={[5.2, 1.8, 4.4]} center distanceFactor={13}>
               <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zinc-900 border border-emerald-500 text-emerald-200 text-[11px] font-bold shadow-md whitespace-nowrap pointer-events-none">
                 <HeartPulse className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Tenda Pengungsian & Posko Medis BPBD</span>
+                <span>{isEn ? 'Evacuee Relief Tents & Medical Clinic' : 'Tenda Pengungsian & Posko Medis BPBD'}</span>
               </div>
             </Html>
           )}
@@ -1471,7 +1475,7 @@ export const TornadoScene: React.FC<TornadoSceneProps> = ({
             className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
           >
             <span className="w-2.5 h-2.5 rounded-full bg-white" />
-            <span>BERLINDUNG DI RUANG TENGAH TANPA JENDELA (+50 XP)</span>
+            <span>{isEn ? 'SHELTER IN WINDOWLESS INTERIOR ROOM (+50 XP)' : 'BERLINDUNG DI RUANG TENGAH TANPA JENDELA (+50 XP)'}</span>
           </button>
         </Html>
       )}

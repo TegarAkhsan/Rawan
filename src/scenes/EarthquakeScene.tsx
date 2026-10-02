@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Activity, 
   ShieldAlert, 
@@ -641,6 +642,9 @@ export const EarthquakeScene: React.FC<EarthquakeSceneProps> = ({
   onActionClick,
   showCutaway: externalCutaway
 }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
   // ─── REFS ───
   const groundGroupRef       = useRef<THREE.Group>(null);
   const leftPlateref         = useRef<THREE.Group>(null);
@@ -1484,35 +1488,35 @@ export const EarthquakeScene: React.FC<EarthquakeSceneProps> = ({
           {/* Label 1: Hypocenter / Fokus Gempa */}
           <Html position={[-0.8, -3.2, 7.8]} center distanceFactor={8.5}>
             <div className="px-3 py-1.5 rounded-xl bg-red-950 text-white font-black text-[10.5px] tracking-wider border border-red-600 shadow-md whitespace-nowrap pointer-events-none">
-              💥 Hiposentrum (Fokus Gempa - Kedalaman 15 km)
+              💥 {isEn ? 'Hypocenter (Earthquake Focus - Depth 15 km)' : 'Hiposentrum (Fokus Gempa - Kedalaman 15 km)'}
             </div>
           </Html>
 
           {/* Label 2: Active Fault Plane */}
           <Html position={[-3.8, -1.6, 7.8]} center distanceFactor={8.5}>
             <div className="px-2.5 py-1.5 rounded-xl bg-amber-950 text-amber-200 font-bold text-[10px] tracking-wider border border-amber-600 shadow-md whitespace-nowrap pointer-events-none">
-              ⚡ Bidang Patahan Sesar Aktif (Fault Plane Friction & Slip)
+              ⚡ {isEn ? 'Active Fault Plane (Tectonic Friction & Slip)' : 'Bidang Patahan Sesar Aktif (Fault Plane Friction & Slip)'}
             </div>
           </Html>
 
           {/* Label 3: Epicenter on Surface */}
           <Html position={[-0.8, 0.8, 0.5]} center distanceFactor={8.5}>
             <div className="px-3 py-1.5 rounded-xl bg-zinc-900 text-white font-black text-[10.5px] tracking-wider border border-zinc-700 shadow-md whitespace-nowrap pointer-events-none">
-              🎯 Episentrum (Titik Pusat Permukaan)
+              🎯 {isEn ? 'Epicenter (Surface Focal Point)' : 'Episentrum (Titik Pusat Permukaan)'}
             </div>
           </Html>
 
           {/* Label 4: Drop, Cover, Hold On Indoor Mitigation */}
           <Html position={[-5.5, 3.2, -1.0]} center distanceFactor={8.5}>
             <div className="px-2.5 py-1.5 rounded-xl bg-emerald-950 text-emerald-200 font-bold text-[10px] tracking-wider border border-emerald-600 shadow-md whitespace-nowrap pointer-events-none">
-              🛡️ Zona Mitigasi: Drop, Cover, Hold On (Bawah Meja)
+              🛡️ {isEn ? 'Mitigation Zone: Drop, Cover, Hold On (Under Desk)' : 'Zona Mitigasi: Drop, Cover, Hold On (Bawah Meja)'}
             </div>
           </Html>
 
           {/* Label 5: Open Evacuation Assembly Point */}
           <Html position={[6.5, 2.2, 4.8]} center distanceFactor={8.5}>
             <div className="px-3 py-1.5 rounded-xl bg-blue-950 text-blue-200 font-bold text-[10px] tracking-wider border border-blue-600 shadow-md whitespace-nowrap pointer-events-none">
-              📍 Titik Kumpul Terbuka (Bebas Bahaya Bangunan & Kaca)
+              📍 {isEn ? 'Open Assembly Point (Clear of Hazards)' : 'Titik Kumpul Terbuka (Bebas Bahaya Bangunan & Kaca)'}
             </div>
           </Html>
         </group>
@@ -1528,7 +1532,7 @@ export const EarthquakeScene: React.FC<EarthquakeSceneProps> = ({
           className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
         >
           <span className="w-2.5 h-2.5 rounded-full bg-white" />
-          <span>DROP, COVER, HOLD ON (LINDUNGI DIRI DI BAWAH MEJA)</span>
+          <span>{isEn ? 'DROP, COVER, HOLD ON (PROTECT HEAD UNDER TABLE)' : 'DROP, COVER, HOLD ON (LINDUNGI DIRI DI BAWAH MEJA)'}</span>
         </button>
       </Html>
     </group>

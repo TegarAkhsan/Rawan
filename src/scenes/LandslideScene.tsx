@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Mountain, 
   AlertTriangle, 
@@ -482,6 +483,9 @@ export const LandslideScene: React.FC<LandslideSceneProps> = ({
   onActionClick,
   showCutaway: externalCutaway
 }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
   // ─── REFS ───
   const dioramaGroupRef     = useRef<THREE.Group>(null);
   const rainRef             = useRef<THREE.InstancedMesh>(null);
@@ -1190,7 +1194,7 @@ export const LandslideScene: React.FC<LandslideSceneProps> = ({
           <Html position={[-7.8, 5.2, 0]} center distanceFactor={12}>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 border border-amber-500/80 text-amber-300 text-[11px] font-bold shadow-xl backdrop-blur-md whitespace-nowrap animate-pulse pointer-events-none">
               <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-              <span>Mahkota Retakan (Crown Tension Crack)</span>
+              <span>{isEn ? 'Crown Tension Crack' : 'Mahkota Retakan (Crown Tension Crack)'}</span>
             </div>
           </Html>
 
@@ -1198,7 +1202,7 @@ export const LandslideScene: React.FC<LandslideSceneProps> = ({
           <Html position={[-5.5, 2.2, 0]} center distanceFactor={12}>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 border border-rose-500/80 text-rose-300 text-[11px] font-bold shadow-xl backdrop-blur-md whitespace-nowrap pointer-events-none">
               <Zap className="w-3.5 h-3.5 text-rose-400" />
-              <span>Bidang Gelincir (Slip Surface)</span>
+              <span>{isEn ? 'Basal Slip Surface Plane' : 'Bidang Gelincir (Slip Surface)'}</span>
             </div>
           </Html>
 
@@ -1206,7 +1210,7 @@ export const LandslideScene: React.FC<LandslideSceneProps> = ({
           <Html position={[-2.4, 1.4, 0]} center distanceFactor={12}>
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900/90 border border-cyan-500/80 text-cyan-300 text-[11px] font-bold shadow-xl backdrop-blur-md whitespace-nowrap pointer-events-none">
               <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Dinding Penahan & Bronjong</span>
+              <span>{isEn ? 'Retaining Wall & Gabion' : 'Dinding Penahan & Bronjong'}</span>
             </div>
           </Html>
 
@@ -1214,7 +1218,7 @@ export const LandslideScene: React.FC<LandslideSceneProps> = ({
           <Html position={[7.5, 3.2, 0]} center distanceFactor={12}>
             <div className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-zinc-900 border border-emerald-500 text-emerald-200 text-[11px] font-bold shadow-md whitespace-nowrap pointer-events-none">
               <Compass className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Titik Kumpul Evakuasi Lateral</span>
+              <span>{isEn ? 'Lateral Evacuation Assembly Point' : 'Titik Kumpul Evakuasi Lateral'}</span>
             </div>
           </Html>
         </group>
@@ -1230,7 +1234,7 @@ export const LandslideScene: React.FC<LandslideSceneProps> = ({
           className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
         >
           <span className="w-2.5 h-2.5 rounded-full bg-white" />
-          <span>EVAKUASI LATERAL (LARI MENYAMPING KE DATARAN TINGGI)</span>
+          <span>{isEn ? 'LATERAL EVACUATION (SPRINT SIDEWAYS TO HIGH GROUND)' : 'EVAKUASI LATERAL (LARI MENYAMPING KE DATARAN TINGGI)'}</span>
         </button>
       </Html>
     </group>

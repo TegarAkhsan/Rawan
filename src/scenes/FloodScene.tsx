@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 
 export type FloodStage = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -269,6 +270,9 @@ export const FloodScene: React.FC<FloodSceneProps> = ({
   onActionClick,
   showCutaway: externalCutaway
 }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
   // Animation Refs (Separated River Water and Urban Floodwater to PREVENT Z-fighting!)
   const riverWaterRef = useRef<THREE.Mesh>(null);
   const urbanFloodRef = useRef<THREE.Mesh>(null);
@@ -509,7 +513,7 @@ export const FloodScene: React.FC<FloodSceneProps> = ({
             {/* 3D Label attached to Peilschaal */}
             <Html position={[0, 1.4, 0]} center distanceFactor={8.5}>
               <div className="px-2 py-0.5 rounded-lg bg-slate-950/95 text-cyan-300 font-black text-[9.5px] tracking-wider border border-cyan-500 shadow-md whitespace-nowrap pointer-events-none">
-                📊 Peilschaal Sungai
+                📊 {isEn ? 'River Gauge (Peilschaal)' : 'Peilschaal Sungai'}
               </div>
             </Html>
           </group>
@@ -526,7 +530,7 @@ export const FloodScene: React.FC<FloodSceneProps> = ({
             </mesh>
             <Html position={[0, 0.2, 0.06]} center distanceFactor={7.5}>
               <div className="text-[8px] font-black text-white text-center leading-tight tracking-tight uppercase">
-                Sungai Ciliwung<br/><span className="text-cyan-200 text-[6.5px]">Pos Pemantauan Debit</span>
+                {isEn ? <>Ciliwung River<br/><span className="text-cyan-200 text-[6.5px]">Discharge Gauge Post</span></> : <>Sungai Ciliwung<br/><span className="text-cyan-200 text-[6.5px]">Pos Pemantauan Debit</span></>}
               </div>
             </Html>
           </group>
@@ -628,7 +632,7 @@ export const FloodScene: React.FC<FloodSceneProps> = ({
               {/* 3D Warning Badge directly over clogged drain */}
               <Html position={[0, 0.8, 0]} center distanceFactor={8.5}>
                 <div className="px-2.5 py-1 rounded-xl bg-red-950 text-white font-black text-[10px] tracking-wider border border-red-600 shadow-md whitespace-nowrap pointer-events-none">
-                  ⚠️ Drainase Tersumbat Sampah!
+                  ⚠️ {isEn ? 'Stormwater Drain Clogged with Debris!' : 'Drainase Tersumbat Sampah!'}
                 </div>
               </Html>
             </group>
@@ -693,7 +697,7 @@ export const FloodScene: React.FC<FloodSceneProps> = ({
               className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-black text-xs shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
             >
               <span className="w-2.5 h-2.5 rounded-full bg-white" />
-              <span>EVAKUASI KE LANTAI 2!</span>
+              <span>{isEn ? 'EVACUATE TO 2ND FLOOR!' : 'EVAKUASI KE LANTAI 2!'}</span>
             </button>
           </Html>
         </group>
@@ -732,7 +736,7 @@ export const FloodScene: React.FC<FloodSceneProps> = ({
               }}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-600 hover:bg-amber-500 text-white font-black text-[11px] shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border border-white pointer-events-auto"
             >
-              <span>⚡ MATIKAN MCB LISTRIK!</span>
+              <span>{isEn ? '⚡ SHUT OFF ELECTRICAL BREAKER!' : '⚡ MATIKAN MCB LISTRIK!'}</span>
             </button>
           </Html>
         </group>
@@ -866,21 +870,21 @@ export const FloodScene: React.FC<FloodSceneProps> = ({
           {/* Label 1: River Depth & Discharge */}
           <Html position={[-7.5, -1.2, 8.8]} center distanceFactor={8.5}>
             <div className="px-3 py-1.5 rounded-xl bg-zinc-900 text-cyan-200 font-bold text-[10px] tracking-wider border border-zinc-700 shadow-md whitespace-nowrap pointer-events-none">
-              🌊 Penampang Palung Sungai (Debit Kritis)
+              🌊 {isEn ? 'River Channel Profile (Critical Discharge)' : 'Penampang Palung Sungai (Debit Kritis)'}
             </div>
           </Html>
 
           {/* Label 2: Clogged Drainage Culvert */}
           <Html position={[-2.2, -2.4, 8.8]} center distanceFactor={8.5}>
             <div className="px-2.5 py-1.5 rounded-xl bg-amber-950 text-amber-200 font-black text-[10px] tracking-wider border border-amber-600 shadow-md whitespace-nowrap pointer-events-none">
-              ⚠️ Gorong-gorong Tersumbat Sampah (Air Membalik!)
+              ⚠️ {isEn ? 'Culvert Clogged with Debris (Backflow Hazard!)' : 'Gorong-gorong Tersumbat Sampah (Air Membalik!)'}
             </div>
           </Html>
 
           {/* Label 3: Soil Saturated Infiltration */}
           <Html position={[4.5, -1.2, 8.8]} center distanceFactor={8.5}>
             <div className="px-3 py-1.5 rounded-xl bg-blue-950 text-blue-200 font-bold text-[10px] tracking-wider border border-blue-600 shadow-md whitespace-nowrap pointer-events-none">
-              ⬇️ Kapasitas Infiltrasi Jenuh (Resapan 0%)
+              ⬇️ {isEn ? 'Saturated Infiltration Capacity (0% Absorption)' : 'Kapasitas Infiltrasi Jenuh (Resapan 0%)'}
             </div>
           </Html>
         </group>
