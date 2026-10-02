@@ -65,7 +65,7 @@ export interface SimulationScenario {
   briefing: string;
   objective: string;
   steps: SimulationStep[];
-  hazardLevel: 'Waspada' | 'Siaga' | 'Awas';
+  hazardLevel: 'Waspada' | 'Siaga' | 'Awas' | string;
 }
 
 export interface QuizQuestion {

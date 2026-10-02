@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 
 export type TsunamiStage = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -306,6 +307,9 @@ export const TsunamiScene: React.FC<TsunamiSceneProps> = ({
   onActionClick,
   showCutaway: externalCutaway
 }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
   // Animation Refs
   const oceanMeshRef = useRef<THREE.Mesh>(null);
   const waterLeftWallRef = useRef<THREE.Mesh>(null);
@@ -1485,32 +1489,32 @@ export const TsunamiScene: React.FC<TsunamiSceneProps> = ({
             {tsunamiStage === 0 ? (
               <div className="px-3.5 py-1.5 rounded-xl bg-zinc-900 text-white font-bold text-[11px] tracking-wider border border-zinc-700 shadow-md whitespace-nowrap pointer-events-none flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>AKUMULASI REGANGAN: Lempeng Samudra Menunjam &amp; Lempeng Benua Terkunci</span>
+                <span>{isEn ? 'STRAIN ACCUMULATION: Oceanic Plate Subducting & Continental Plate Locked' : 'AKUMULASI REGANGAN: Lempeng Samudra Menunjam & Lempeng Benua Terkunci'}</span>
               </div>
             ) : tsunamiStage === 1 ? (
               <div className="px-3.5 py-1.5 rounded-xl bg-red-950 text-white font-black text-[11px] tracking-wider border border-red-600 shadow-md whitespace-nowrap pointer-events-none flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-500" />
-                <span>PELEPASAN GEMPA MEGATHRUST: Lempeng Benua Terpelanting &amp; Kolom Air Terangkat!</span>
+                <span>{isEn ? 'MEGATHRUST RUPTURE: Continental Plate Rebounds & Water Column Uplifted!' : 'PELEPASAN GEMPA MEGATHRUST: Lempeng Benua Terpelanting & Kolom Air Terangkat!'}</span>
               </div>
             ) : tsunamiStage === 2 ? (
               <div className="px-3.5 py-1.5 rounded-xl bg-amber-950 text-amber-200 font-black text-[11px] tracking-wider border border-amber-600 shadow-md whitespace-nowrap pointer-events-none flex items-center gap-2">
-                <span>🌊 PALUNG GELOMBANG: Air Pesisir Tersedot Kuat Menuju Palung Patahan (Surut Mendadak)</span>
+                <span>{isEn ? '🌊 WAVE TROUGH: Coastal Water Rapidly Recedes Toward Fault Trench' : '🌊 PALUNG GELOMBANG: Air Pesisir Tersedot Kuat Menuju Palung Patahan (Surut Mendadak)'}</span>
               </div>
             ) : tsunamiStage === 3 ? (
               <div className="px-3.5 py-1.5 rounded-xl bg-zinc-900 text-cyan-200 font-black text-[11px] tracking-wider border border-zinc-700 shadow-md whitespace-nowrap pointer-events-none flex items-center gap-2">
-                <span>⚡ RAMBATAN ENERGI: Gelombang Tsunami Memadat &amp; Meninggi Menuju Daratan (Shoaling)</span>
+                <span>{isEn ? '⚡ SHOALING WAVE ENERGY: Tsunami Waves Compress & Surge Toward Shore' : '⚡ RAMBATAN ENERGI: Gelombang Tsunami Memadat & Meninggi Menuju Daratan (Shoaling)'}</span>
               </div>
             ) : tsunamiStage === 4 ? (
               <div className="px-3.5 py-1.5 rounded-xl bg-red-950 text-white font-black text-[11px] tracking-wider border border-red-600 shadow-md whitespace-nowrap pointer-events-none flex items-center gap-2">
-                <span>💥 HANTAMAN TSUNAMI: Energi Kinetik Menerjang Garis Pantai &amp; Merusak Permukiman</span>
+                <span>{isEn ? '💥 TSUNAMI IMPACT: Kinetic Surge Hits Coastline & Inundates Infrastructure' : '💥 HANTAMAN TSUNAMI: Energi Kinetik Menerjang Garis Pantai & Merusak Permukiman'}</span>
               </div>
             ) : tsunamiStage === 5 ? (
               <div className="px-3.5 py-1.5 rounded-xl bg-blue-950 text-blue-200 font-black text-[11px] tracking-wider border border-blue-600 shadow-md whitespace-nowrap pointer-events-none flex items-center gap-2">
-                <span>🌊 GENANGAN DARATAN: Gelombang Menggenangi Dataran Rendah hingga Kaki Bukit</span>
+                <span>{isEn ? '🌊 LAND INUNDATION: Surge Inundates Lowlands up to Hill Foothills' : '🌊 GENANGAN DARATAN: Gelombang Menggenangi Dataran Rendah hingga Kaki Bukit'}</span>
               </div>
             ) : (
               <div className="px-3.5 py-1.5 rounded-xl bg-emerald-950 text-white font-bold text-[11px] tracking-wider border border-emerald-600 shadow-md whitespace-nowrap pointer-events-none flex items-center gap-2">
-                <span>✅ PASCABENCANA: Air Surut Kembali, Tempat Evakuasi Sementara (TES) Menyelamatkan Warga</span>
+                <span>{isEn ? '✅ POST-DISASTER: Receding Waters, Designated Temporary Evacuation Shelter' : '✅ PASCABENCANA: Air Surut Kembali, Tempat Evakuasi Sementara (TES) Menyelamatkan Warga'}</span>
               </div>
             )}
           </Html>
@@ -1518,7 +1522,7 @@ export const TsunamiScene: React.FC<TsunamiSceneProps> = ({
           {/* Left Plate Label */}
           <Html position={[-5.8, -2.5, 0]} center distanceFactor={14}>
             <div className="px-2.5 py-1.5 rounded-xl bg-zinc-900 text-cyan-200 font-bold text-[10px] tracking-wider border border-zinc-700 shadow-md whitespace-nowrap pointer-events-none">
-              🌊 Lempeng Samudra (Subduksi ~6 cm/th)
+              {isEn ? '🌊 Oceanic Plate (Subduction ~6 cm/yr)' : '🌊 Lempeng Samudra (Subduksi ~6 cm/th)'}
             </div>
           </Html>
 
@@ -1529,14 +1533,18 @@ export const TsunamiScene: React.FC<TsunamiSceneProps> = ({
                 ? 'bg-red-950 text-white border-red-600'
                 : 'bg-zinc-900 text-amber-200 border-zinc-700'
             }`}>
-              {tsunamiStage >= 1 ? '⚡ Patahan Megathrust (Slipped/Ruptured)' : '🔒 Zona Terkunci (Locked Fault)'}
+              {isEn 
+                ? (tsunamiStage >= 1 ? '⚡ Megathrust Fault (Slipped / Ruptured)' : '🔒 Locked Subduction Zone')
+                : (tsunamiStage >= 1 ? '⚡ Patahan Megathrust (Slipped/Ruptured)' : '🔒 Zona Terkunci (Locked Fault)')}
             </div>
           </Html>
 
           {/* Right Plate Label */}
           <Html position={[5.8, -2.2, 0]} center distanceFactor={14}>
             <div className="px-2.5 py-1.5 rounded-xl bg-zinc-900 text-amber-200 font-bold text-[10px] tracking-wider border border-zinc-700 shadow-md whitespace-nowrap pointer-events-none">
-              {tsunamiStage === 0 ? '🏔️ Lempeng Benua (Regangan Terkunci)' : '🏔️ Lempeng Benua (Terangkat / Rebound)'}
+              {isEn 
+                ? (tsunamiStage === 0 ? '🏔️ Continental Plate (Locked Strain)' : '🏔️ Continental Plate (Rebound / Uplifted)')
+                : (tsunamiStage === 0 ? '🏔️ Lempeng Benua (Regangan Terkunci)' : '🏔️ Lempeng Benua (Terangkat / Rebound)')}
             </div>
           </Html>
         </group>
@@ -1552,7 +1560,7 @@ export const TsunamiScene: React.FC<TsunamiSceneProps> = ({
           className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
         >
           <span className="w-2.5 h-2.5 rounded-full bg-white" />
-          <span>EVAKUASI KE BUKIT TINGGI (&gt;20 METER)</span>
+          <span>{isEn ? 'EVACUATE TO HIGH GROUND (>20 METERS)' : 'EVAKUASI KE BUKIT TINGGI (>20 METER)'}</span>
         </button>
       </Html>
     </group>

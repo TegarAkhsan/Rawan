@@ -1244,7 +1244,7 @@ export const SIMULATION_SCENARIOS_EN: Record<DisasterId, SimulationScenario> = {
     environmentName: 'Multi-Story School Building',
     briefing: 'You are studying on the 2nd floor when an M 6.8 tectonic earthquake violently strikes the building.',
     objective: 'Execute the Drop, Cover, Hold On protocol and guide classroom evacuation toward the safe assembly point.',
-    hazardLevel: 'Awas',
+    hazardLevel: 'CRITICAL WARNING',
     steps: [
       {
         id: 'eq_step_1',
@@ -1282,7 +1282,7 @@ export const SIMULATION_SCENARIOS_EN: Record<DisasterId, SimulationScenario> = {
     environmentName: 'Coastal Beach & Harbor Settlement',
     briefing: 'Following an M 7.8 offshore earthquake, coastal sea levels recede hundreds of meters suddenly.',
     objective: 'Recognize natural early warning signs and execute vertical evacuation to highland shelters before the wave arrives.',
-    hazardLevel: 'Awas',
+    hazardLevel: 'CRITICAL WARNING',
     steps: [
       {
         id: 'ts_step_1',
@@ -1317,9 +1317,9 @@ export const SIMULATION_SCENARIOS_EN: Record<DisasterId, SimulationScenario> = {
     disasterId: 'VOLCANO',
     title: 'Volcanic Eruption Emergency Response',
     environmentName: 'Active Volcanic Foothills',
-    briefing: 'Volcanic alert level is raised to Level IV (Awas). Explosive rumblings echo and ashfall begins.',
+    briefing: 'Volcanic alert level is raised to Level IV (Warning). Explosive rumblings echo and ashfall begins.',
     objective: 'Evacuate beyond the Hazard Zone (KRB) radius and protect respiratory systems from abrasive silica ash.',
-    hazardLevel: 'Awas',
+    hazardLevel: 'CRITICAL WARNING',
     steps: [
       {
         id: 'vol_step_1',
@@ -1355,7 +1355,7 @@ export const SIMULATION_SCENARIOS_EN: Record<DisasterId, SimulationScenario> = {
     environmentName: 'Lowland Residential Basin',
     briefing: '12 hours of extreme rainfall causes a river embankment breach, and water enters your home 30 cm deep.',
     objective: 'Safeguard electrical systems, protect vital documents, and navigate to high-ground relief centers.',
-    hazardLevel: 'Siaga',
+    hazardLevel: 'WATCH / SIAGA',
     steps: [
       {
         id: 'fl_step_1',
@@ -1390,7 +1390,7 @@ export const SIMULATION_SCENARIOS_EN: Record<DisasterId, SimulationScenario> = {
     environmentName: 'Steep Hillside & Mountain Highway',
     briefing: 'Extreme monsoon rains trigger crown tension cracks atop the hill, and soil mass begins collapsing.',
     objective: 'Execute lateral perpendicular evacuation out of the debris flow trajectory.',
-    hazardLevel: 'Awas',
+    hazardLevel: 'CRITICAL WARNING',
     steps: [
       {
         id: 'ls_step_1',
@@ -1425,7 +1425,7 @@ export const SIMULATION_SCENARIOS_EN: Record<DisasterId, SimulationScenario> = {
     environmentName: 'Open Residential Neighborhood',
     briefing: 'A dark rotating Cumulonimbus storm cloud descends and a destructive wind vortex approaches.',
     objective: 'Seek shelter in the innermost ground-floor room without windows and protect against airborne debris.',
-    hazardLevel: 'Awas',
+    hazardLevel: 'CRITICAL WARNING',
     steps: [
       {
         id: 'to_step_1',

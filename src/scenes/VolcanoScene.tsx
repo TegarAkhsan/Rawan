@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { soundEngine } from '../audio/soundEngine';
+import { useLanguage } from '../context/LanguageContext';
 
 // 0=NORMAL, 1=MAGMA_RISING, 2=PHREATIC, 3=MAGMATIC_RISE, 4=ERUPTION, 5=LAVA_FLOW, 6=POST_ERUPTION
 export type EruptionStage = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -102,7 +103,7 @@ const BPBDReliefTent: React.FC<{ position: [number, number, number]; rotationY?:
         </mesh>
         <Html position={[0, 0, 0.03]} center distanceFactor={8}>
           <span className="text-[10px] font-black tracking-wider text-amber-400 whitespace-nowrap px-2 py-0.5 rounded bg-slate-900/90 border border-amber-500/60 shadow">
-            POSKO UTAMA BPBD &amp; PMI
+            DISASTER RELIEF BASE &amp; FIRST AID
           </span>
         </Html>
       </group>
@@ -155,6 +156,9 @@ export const VolcanoScene: React.FC<VolcanoSceneProps> = ({
   onActionClick,
   showCutaway: externalCutaway
 }) => {
+  const { language } = useLanguage();
+  const isEn = language === 'en';
+
   // ─── REFS ───
   const ashPlumeRef    = useRef<THREE.InstancedMesh>(null);
   const mushroomRef    = useRef<THREE.InstancedMesh>(null);
@@ -753,18 +757,18 @@ export const VolcanoScene: React.FC<VolcanoSceneProps> = ({
         <group>
           <Html position={[2.8, -4.3, 0.2]} center distanceFactor={9}>
             <div className="px-2.5 py-1 rounded-xl bg-red-950 text-white font-black text-[10px] tracking-wider border border-red-600 shadow-md whitespace-nowrap pointer-events-none">
-              🔥 DAPUR MAGMA (Magma Chamber)
+              {isEn ? '🔥 MAGMA CHAMBER' : '🔥 DAPUR MAGMA (Magma Chamber)'}
             </div>
           </Html>
           <Html position={[1.8, -1.8, 0.2]} center distanceFactor={9}>
             <div className="px-2 py-0.5 rounded-lg bg-zinc-900 text-amber-200 font-bold text-[9px] tracking-wider border border-zinc-700 shadow-md whitespace-nowrap pointer-events-none">
-              🌋 PIPA KONDUIT (Magma Conduit)
+              {isEn ? '🌋 MAGMA CONDUIT' : '🌋 PIPA KONDUIT (Magma Conduit)'}
             </div>
           </Html>
           {eruptionStage >= 1 && (
             <Html position={[0, 0.1, 0.2]} center distanceFactor={9}>
               <div className="px-2.5 py-1 rounded-full bg-red-600 text-white font-black text-[10px] tracking-wider border-2 border-white shadow-md whitespace-nowrap pointer-events-none">
-                ↑ MAGMA NAIK KE PERMUKAAN ↑
+                {isEn ? '↑ MAGMA RISING TO SUMMIT ↑' : '↑ MAGMA NAIK KE PERMUKAAN ↑'}
               </div>
             </Html>
           )}
@@ -1158,7 +1162,7 @@ export const VolcanoScene: React.FC<VolcanoSceneProps> = ({
               className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-red-600 hover:bg-red-500 text-white font-black text-xs shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
             >
               <span className="w-2.5 h-2.5 rounded-full bg-white" />
-              <span>EVAKUASI KE POSKO AMAN (&gt;10 KM)</span>
+              <span>{isEn ? 'EVACUATE TO DESIGNATED REFUGE BASE (>10 KM)' : 'EVAKUASI KE POSKO AMAN (>10 KM)'}</span>
             </button>
           </Html>
         )}
