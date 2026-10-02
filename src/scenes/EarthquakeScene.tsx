@@ -1506,11 +1506,24 @@ export const EarthquakeScene: React.FC<EarthquakeSceneProps> = ({
             </div>
           </Html>
 
-          {/* Label 4: Drop, Cover, Hold On Indoor Mitigation */}
-          <Html position={[-5.5, 3.2, -1.0]} center distanceFactor={8.5}>
-            <div className="px-2.5 py-1.5 rounded-xl bg-emerald-950 text-emerald-200 font-bold text-[10px] tracking-wider border border-emerald-600 shadow-md whitespace-nowrap pointer-events-none">
-              🛡️ {isEn ? 'Mitigation Zone: Drop, Cover, Hold On (Under Desk)' : 'Zona Mitigasi: Drop, Cover, Hold On (Bawah Meja)'}
-            </div>
+          {/* Label 4: Drop, Cover, Hold On Indoor Mitigation (Interactive or Educational Badge) */}
+          <Html position={[-5.5, 3.8, -1.0]} center distanceFactor={8.5}>
+            {onActionClick ? (
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  onActionClick('DROP_COVER_HOLD');
+                }}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[11px] shadow-lg cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
+              >
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                <span>{isEn ? 'DROP, COVER, HOLD ON (PROTECT HEAD UNDER TABLE)' : 'DROP, COVER, HOLD ON (LINDUNGI DIRI DI BAWAH MEJA)'}</span>
+              </button>
+            ) : (
+              <div className="px-2.5 py-1.5 rounded-xl bg-emerald-950 text-emerald-200 font-bold text-[10px] tracking-wider border border-emerald-600 shadow-md whitespace-nowrap pointer-events-none">
+                🛡️ {isEn ? 'Mitigation Zone: Drop, Cover, Hold On (Under Desk)' : 'Zona Mitigasi: Drop, Cover, Hold On (Bawah Meja)'}
+              </div>
+            )}
           </Html>
 
           {/* Label 5: Open Evacuation Assembly Point */}
@@ -1521,20 +1534,6 @@ export const EarthquakeScene: React.FC<EarthquakeSceneProps> = ({
           </Html>
         </group>
       )}
-
-      {/* Interactive Mitigation Action Prompt Button */}
-      <Html position={[-5.5, 4.8, -1.0]} center distanceFactor={8.5}>
-        <button
-          onClick={() => {
-            soundEngine.playClick();
-            if (onActionClick) onActionClick('DROP_COVER_HOLD');
-          }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-md cursor-pointer hover:scale-105 transition-all whitespace-nowrap border-2 border-white pointer-events-auto"
-        >
-          <span className="w-2.5 h-2.5 rounded-full bg-white" />
-          <span>{isEn ? 'DROP, COVER, HOLD ON (PROTECT HEAD UNDER TABLE)' : 'DROP, COVER, HOLD ON (LINDUNGI DIRI DI BAWAH MEJA)'}</span>
-        </button>
-      </Html>
     </group>
   );
 };

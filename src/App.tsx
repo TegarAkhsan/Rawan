@@ -65,39 +65,39 @@ const CameraController: React.FC<{
       }
     } else if (view === 'SIMULATION') {
       if (disaster === 'EARTHQUAKE') {
-        camera.position.set(0, 6.8, 15.2);
+        camera.position.set(0, 6.2, 16.2);
         if (controlsRef.current) {
-          controlsRef.current.target.set(0, -0.4, 0);
+          controlsRef.current.target.set(0, 0.5, 0);
           controlsRef.current.update();
         }
       } else if (disaster === 'TSUNAMI') {
-        camera.position.set(0, 3.8, 14.5);
+        camera.position.set(0, 4.2, 15.2);
         if (controlsRef.current) {
-          controlsRef.current.target.set(0, 0.2, 0);
+          controlsRef.current.target.set(0, 0.5, 0);
           controlsRef.current.update();
         }
       } else if (disaster === 'VOLCANO') {
-        camera.position.set(0, 1.8, 14.0);
+        camera.position.set(0, 2.0, 14.5);
         if (controlsRef.current) {
           controlsRef.current.target.set(0, 1.8, 0);
           controlsRef.current.update();
         }
       } else if (disaster === 'FLOOD') {
-        camera.position.set(0, 7.2, 14.8);
+        camera.position.set(0, 6.8, 15.5);
         if (controlsRef.current) {
-          controlsRef.current.target.set(0, -0.4, 0);
+          controlsRef.current.target.set(0, 0.4, 0);
           controlsRef.current.update();
         }
       } else if (disaster === 'LANDSLIDE') {
-        camera.position.set(0, 7.5, 16.0);
+        camera.position.set(0, 7.5, 16.5);
         if (controlsRef.current) {
-          controlsRef.current.target.set(0, 1.2, 0);
+          controlsRef.current.target.set(0, 1.4, 0);
           controlsRef.current.update();
         }
       } else if (disaster === 'TORNADO') {
-        camera.position.set(0, 6.5, 15.5);
+        camera.position.set(0, 6.5, 16.0);
         if (controlsRef.current) {
-          controlsRef.current.target.set(0, 0.4, 0);
+          controlsRef.current.target.set(0, 0.6, 0);
           controlsRef.current.update();
         }
       }

@@ -277,7 +277,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
       {/* PROCESS STAGE NAVIGATOR — Bottom Left Panel                         */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {stagesList.length > 0 && activeStageData && (
-        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 max-w-[calc(100%-1.5rem)] sm:max-w-[340px] z-30 pointer-events-auto">
+        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 max-w-[calc(100%-1.5rem)] sm:max-w-[320px] z-30 pointer-events-auto">
           {isStageMinimized ? (
             <button
               onClick={() => {
@@ -290,28 +290,28 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 className="w-2.5 h-2.5 rounded-full"
                 style={{ backgroundColor: activeStageData.pvmbgColor }}
               />
-              <span>
+              <span className="truncate max-w-[190px]">
                 {isEn ? 'Stage' : 'Tahap'} {activeStageIndex !== undefined ? activeStageIndex + 1 : 1}: {activeStageData.title}
               </span>
-              <Maximize2 className="w-3.5 h-3.5 text-zinc-400" />
+              <Maximize2 className="w-3.5 h-3.5 text-zinc-400 shrink-0" />
             </button>
           ) : (
-            <div className="bg-zinc-950/95 border border-zinc-800 rounded-2xl shadow-xl backdrop-blur-xl overflow-hidden">
+            <div className="bg-zinc-950/95 border border-zinc-800 rounded-2xl shadow-xl backdrop-blur-xl overflow-hidden animate-in fade-in zoom-in-95">
               
               {/* Stage Header with Status Badge */}
-              <div className="p-3 sm:p-3.5">
+              <div className="p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2 min-w-0">
                     {/* Stage Icon */}
                     <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0"
                       style={{ 
                         backgroundColor: `${activeStageData.pvmbgColor}20`, 
                         border: `1px solid ${activeStageData.pvmbgColor}60`
                       }}
                     >
                       {React.createElement(activeStageData.icon, { 
-                        className: 'w-4 h-4',
+                        className: 'w-3.5 h-3.5',
                         style: { color: activeStageData.pvmbgColor }
                       })}
                     </div>
@@ -353,18 +353,18 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                 </div>
 
                 {/* Subtitle */}
-                <div className="text-[10px] font-semibold text-zinc-400 mb-2 flex items-center gap-1.5">
+                <div className="text-[10px] font-semibold text-zinc-400 mb-1.5 flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: activeStageData.pvmbgColor }} />
                   <span className="truncate">{activeStageData.subtitle}</span>
                 </div>
 
                 {/* Scientific Description */}
-                <p className="text-[11px] text-zinc-300 leading-relaxed bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 mb-2">
+                <p className="text-[10.5px] text-zinc-300 leading-relaxed bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 mb-2 max-h-24 overflow-y-auto custom-scrollbar">
                   {activeStageData.description}
                 </p>
 
                 {/* Visual Hint */}
-                <div className="text-[10px] text-amber-300 bg-zinc-900 px-2.5 py-1 rounded-lg border border-zinc-800 flex items-start gap-1.5">
+                <div className="text-[9.5px] text-amber-300 bg-zinc-900/90 px-2 py-1 rounded-lg border border-zinc-800 flex items-start gap-1.5">
                   <Sparkles className="w-3 h-3 shrink-0 text-amber-400 mt-0.5" />
                   <span className="leading-snug">{activeStageData.visualHint}</span>
                 </div>
