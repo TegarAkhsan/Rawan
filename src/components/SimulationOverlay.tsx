@@ -80,8 +80,17 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showBriefing, setShowBriefing] = useState(true);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true);
   const [isStageMinimized, setIsStageMinimized] = useState(false);
+
+  // Reset scenario dialog when switching disaster
+  useEffect(() => {
+    setCurrentStepIndex(0);
+    setSelectedOptionId(null);
+    setIsCompleted(false);
+    setShowBriefing(true);
+    setIsMinimized(true);
+  }, [disasterId]);
 
   // Play atmospheric procedural sound when entering simulation
   useEffect(() => {
