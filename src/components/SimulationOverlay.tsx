@@ -274,160 +274,172 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
       </div>
 
       {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* PROCESS STAGE NAVIGATOR — Bottom Left Panel */}
+      {/* DOCKED BOTTOM CENTER — STAGE STEPPER CONTROLLER BAR                 */}
       {/* ═══════════════════════════════════════════════════════════════════ */}
       {stagesList.length > 0 && activeStageData && (
-        <div className="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 max-w-[calc(100%-1.5rem)] sm:max-w-[340px] z-30 pointer-events-auto">
-          {isStageMinimized ? (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-auto max-w-[calc(100%-2rem)]">
+          <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl bg-zinc-950/95 border border-zinc-800 shadow-2xl backdrop-blur-xl">
+            {/* Prev Stage Button */}
+            <button
+              onClick={handleStagePrev}
+              disabled={activeStageIndex === undefined || activeStageIndex <= 0}
+              className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed text-zinc-300 hover:text-white border border-zinc-800 transition-all flex items-center justify-center cursor-pointer"
+              title={isEn ? 'Previous Stage' : 'Tahap Sebelumnya'}
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+            </button>
+
+            {/* Active Stage Indicator / Title */}
             <button
               onClick={() => {
                 soundEngine.playClick();
-                setIsStageMinimized(false);
+                setIsStageMinimized(!isStageMinimized);
               }}
-              className="px-3 py-2 rounded-xl bg-zinc-950/95 border border-zinc-800 text-white shadow-xl backdrop-blur-xl flex items-center gap-2 text-xs font-bold hover:border-emerald-500 transition-all cursor-pointer"
+              className="flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-zinc-900 text-left transition-colors cursor-pointer group"
+              title={isEn ? 'Click to view detailed scientific explanation' : 'Klik untuk melihat penjelasan sains lengkap'}
             >
               <div 
-                className="w-2.5 h-2.5 rounded-full"
+                className="w-2.5 h-2.5 rounded-full shrink-0"
                 style={{ backgroundColor: activeStageData.pvmbgColor }}
               />
-              <span>
-                {isEn ? 'Stage' : 'Tahap'} {activeStageIndex !== undefined ? activeStageIndex + 1 : 1}: {activeStageData.title}
-              </span>
-              <Maximize2 className="w-3.5 h-3.5 text-zinc-400" />
-            </button>
-          ) : (
-            <div className="bg-zinc-950/95 border border-zinc-800 rounded-2xl shadow-xl backdrop-blur-xl overflow-hidden">
-              
-              {/* Stage Header with Status Badge */}
-              <div className="p-3 sm:p-3.5">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    {/* Stage Icon */}
-                    <div 
-                      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ 
-                        backgroundColor: `${activeStageData.pvmbgColor}20`, 
-                        border: `1px solid ${activeStageData.pvmbgColor}60`
-                      }}
-                    >
-                      {React.createElement(activeStageData.icon, { 
-                        className: 'w-4 h-4',
-                        style: { color: activeStageData.pvmbgColor }
-                      })}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400">
-                        {isEn ? `Stage ${activeStageIndex !== undefined ? activeStageIndex + 1 : 1} of ${stagesList.length}` : `Tahap ${activeStageIndex !== undefined ? activeStageIndex + 1 : 1} dari ${stagesList.length}`}
-                      </div>
-                      <div className="text-xs font-bold text-white leading-tight truncate">
-                        {activeStageData.title}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {/* Status Badge */}
-                    <span 
-                      className="text-[9px] font-bold px-2 py-0.5 rounded-full border tracking-wide"
-                      style={{
-                        backgroundColor: `${activeStageData.pvmbgColor}20`,
-                        borderColor: `${activeStageData.pvmbgColor}60`,
-                        color: activeStageData.pvmbgColor
-                      }}
-                    >
-                      {activeStageData.pvmbgLevel}
-                    </span>
-
-                    {/* Minimize Button */}
-                    <button
-                      onClick={() => {
-                        soundEngine.playClick();
-                        setIsStageMinimized(true);
-                      }}
-                      className="p-1 rounded-md text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors cursor-pointer"
-                      title={isEn ? 'Minimize Stage Panel' : 'Sembunyikan Panel Tahap'}
-                    >
-                      <Minimize2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Subtitle / Scientific explanation */}
-                <div className="text-[10px] font-semibold text-zinc-400 mb-2 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: activeStageData.pvmbgColor }} />
-                  <span className="truncate">{activeStageData.subtitle}</span>
-                </div>
-
-                {/* Description */}
-                <p className="text-[11px] text-zinc-300 leading-relaxed bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 mb-2">
-                  {activeStageData.description}
-                </p>
-
-                {/* Visual Hint */}
-                <div className="text-[10px] text-amber-300 bg-zinc-900 px-2.5 py-1 rounded-lg border border-zinc-800 flex items-start gap-1.5">
-                  <Sparkles className="w-3 h-3 shrink-0 text-amber-400 mt-0.5" />
-                  <span className="leading-snug">{activeStageData.visualHint}</span>
-                </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-white group-hover:text-emerald-400 transition-colors whitespace-nowrap">
+                  {isEn ? `Stage ${activeStageIndex !== undefined ? activeStageIndex + 1 : 1}` : `Tahap ${activeStageIndex !== undefined ? activeStageIndex + 1 : 1}`}:
+                </span>
+                <span className="text-[11px] font-medium text-zinc-300 truncate max-w-[120px] sm:max-w-[200px] md:max-w-[260px]">
+                  {activeStageData.title}
+                </span>
               </div>
+            </button>
 
-              {/* Stage Stepper Progress Dots & Prev/Next Controls */}
-              <div className="px-3 py-2 bg-zinc-900 border-t border-zinc-800 flex items-center justify-between gap-1.5">
-                
-                {/* Previous Button */}
-                <button
-                  onClick={handleStagePrev}
-                  disabled={activeStageIndex === undefined || activeStageIndex <= 0}
-                  className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-bold text-zinc-300 hover:text-white border border-zinc-700 transition-all flex items-center gap-1 cursor-pointer"
-                  title={isEn ? 'Previous Stage' : 'Tahap Sebelumnya'}
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{isEn ? 'Previous' : 'Sebelumnya'}</span>
-                </button>
+            {/* Stepper Dots */}
+            <div className="hidden sm:flex items-center gap-1 px-1">
+              {stagesList.map((stg, idx) => {
+                const isActive = idx === activeStageIndex;
+                const isPassed = activeStageIndex !== undefined && idx < activeStageIndex;
+                return (
+                  <button
+                    key={stg.id}
+                    onClick={() => {
+                      soundEngine.playClick();
+                      if (handleSetStage) handleSetStage(idx as any);
+                    }}
+                    className={`transition-all duration-200 cursor-pointer rounded-full ${
+                      isActive
+                        ? 'w-4 h-1.5 shadow-sm'
+                        : isPassed
+                        ? 'w-1.5 h-1.5 bg-zinc-500 hover:bg-zinc-400'
+                        : 'w-1.5 h-1.5 bg-zinc-700 hover:bg-zinc-600'
+                    }`}
+                    style={isActive ? { backgroundColor: activeStageData.pvmbgColor } : {}}
+                    title={isEn ? `Jump to Stage ${idx + 1}: ${stg.title}` : `Pindah ke Tahap ${idx + 1}: ${stg.title}`}
+                  />
+                );
+              })}
+            </div>
 
-                {/* Progress Stage Dots */}
-                <div className="flex items-center gap-1">
-                  {stagesList.map((stg, idx) => {
-                    const isActive = idx === activeStageIndex;
-                    const isPassed = activeStageIndex !== undefined && idx < activeStageIndex;
-                    return (
-                      <button
-                        key={stg.id}
-                        onClick={() => {
-                          soundEngine.playClick();
-                          if (handleSetStage) handleSetStage(idx as any);
-                        }}
-                        className={`transition-all duration-200 cursor-pointer rounded-full ${
-                          isActive
-                            ? 'w-4 h-1.5 rounded-full shadow-sm'
-                            : isPassed
-                            ? 'w-1.5 h-1.5 bg-zinc-500 hover:bg-zinc-400'
-                            : 'w-1.5 h-1.5 bg-zinc-700 hover:bg-zinc-600'
-                        }`}
-                        style={isActive ? { backgroundColor: activeStageData.pvmbgColor } : {}}
-                        title={isEn ? `Jump to Stage ${idx + 1}: ${stg.title}` : `Pindah ke Tahap ${idx + 1}: ${stg.title}`}
-                      />
-                    );
-                  })}
+            {/* Next Stage Button */}
+            <button
+              onClick={handleStageNext}
+              disabled={activeStageIndex === undefined || activeStageIndex >= stagesList.length - 1}
+              className="p-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed text-zinc-300 hover:text-white border border-zinc-800 transition-all flex items-center justify-center cursor-pointer"
+              title={isEn ? 'Next Stage' : 'Tahap Selanjutnya'}
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+
+            <span className="text-zinc-700">|</span>
+
+            {/* Toggle Info / Description Button */}
+            <button
+              onClick={() => {
+                soundEngine.playClick();
+                setIsStageMinimized(!isStageMinimized);
+              }}
+              className={`p-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center justify-center cursor-pointer ${
+                !isStageMinimized
+                  ? 'bg-emerald-600 text-white border-emerald-500'
+                  : 'bg-zinc-900 text-zinc-400 hover:text-white border-zinc-800'
+              }`}
+              title={isEn ? 'Toggle Stage Details' : 'Buka / Tutup Detail Sains'}
+            >
+              <Info className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* FLOATING DETAIL DRAWER ON THE RIGHT (When Expanded)                   */}
+      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {stagesList.length > 0 && activeStageData && !isStageMinimized && (
+        <div className="absolute top-16 right-3 sm:top-16 sm:right-4 w-[calc(100%-1.5rem)] sm:w-80 max-h-[70vh] z-30 pointer-events-auto bg-zinc-950/95 border border-zinc-700/80 rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 overflow-y-auto custom-scrollbar">
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <div className="flex items-center gap-2">
+              <div 
+                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                style={{ 
+                  backgroundColor: `${activeStageData.pvmbgColor}20`, 
+                  border: `1px solid ${activeStageData.pvmbgColor}60`
+                }}
+              >
+                {React.createElement(activeStageData.icon, { 
+                  className: 'w-4 h-4',
+                  style: { color: activeStageData.pvmbgColor }
+                })}
+              </div>
+              <div>
+                <div className="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400">
+                  {isEn ? `Stage ${activeStageIndex !== undefined ? activeStageIndex + 1 : 1} of ${stagesList.length}` : `Tahap ${activeStageIndex !== undefined ? activeStageIndex + 1 : 1} dari ${stagesList.length}`}
                 </div>
-
-                {/* Next Button */}
-                <button
-                  onClick={handleStageNext}
-                  disabled={activeStageIndex === undefined || activeStageIndex >= stagesList.length - 1}
-                  className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed text-[11px] font-bold text-zinc-300 hover:text-white border border-zinc-700 transition-all flex items-center gap-1 cursor-pointer"
-                  title={isEn ? 'Next Stage' : 'Tahap Selanjutnya'}
-                >
-                  <span className="hidden sm:inline">{isEn ? 'Next' : 'Selanjutnya'}</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                <h4 className="text-xs font-bold text-white leading-tight">
+                  {activeStageData.title}
+                </h4>
               </div>
             </div>
-          )}
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span 
+                className="text-[9px] font-bold px-2 py-0.5 rounded-full border tracking-wide"
+                style={{
+                  backgroundColor: `${activeStageData.pvmbgColor}20`,
+                  borderColor: `${activeStageData.pvmbgColor}60`,
+                  color: activeStageData.pvmbgColor
+                }}
+              >
+                {activeStageData.pvmbgLevel}
+              </span>
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  setIsStageMinimized(true);
+                }}
+                className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                title={isEn ? "Close" : "Tutup"}
+              >
+                <XCircle className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="text-[10px] font-semibold text-zinc-400 mb-2 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: activeStageData.pvmbgColor }} />
+            <span className="truncate">{activeStageData.subtitle}</span>
+          </div>
+
+          <p className="text-[11px] text-zinc-300 leading-relaxed bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 mb-2.5">
+            {activeStageData.description}
+          </p>
+
+          <div className="text-[10px] text-amber-300 bg-zinc-900/80 px-2.5 py-1.5 rounded-xl border border-zinc-800 flex items-start gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 shrink-0 text-amber-400 mt-0.5" />
+            <span className="leading-snug">{activeStageData.visualHint}</span>
+          </div>
         </div>
       )}
 
       {/* Bottom Floating Card Dock — Mission Questions Panel (right side) */}
-      <div className={`absolute bottom-3 right-3 sm:bottom-4 sm:right-4 ${stagesList.length > 0 ? 'w-[calc(50%-1rem)] sm:w-auto sm:max-w-xs' : 'w-[calc(100%-1.5rem)] sm:w-auto sm:max-w-sm'} z-30 pointer-events-auto`}>
+      <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-30 pointer-events-auto">
         
         {/* Minimized Pill Bar */}
         {isMinimized ? (
