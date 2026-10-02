@@ -529,7 +529,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [showBriefing, setShowBriefing] = useState(true);
+  const [showBriefing, setShowBriefing] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isStageMinimized, setIsStageMinimized] = useState(false);
 
@@ -817,8 +817,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
               </span>
             </span>
           </div>
-          <span className="text-zinc-700">|</span>
-          <span className="text-[11px] font-bold text-white hidden sm:inline">{scenario.environmentName}</span>
+
         </div>
 
         {/* Simulation Controls (Right) */}
@@ -924,11 +923,7 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
                   {activeStageData.description}
                 </p>
 
-                {/* Visual Hint */}
-                <div className="text-[10px] text-amber-300 bg-zinc-900 px-2.5 py-1 rounded-lg border border-zinc-800 flex items-start gap-1.5">
-                  <Sparkles className="w-3 h-3 shrink-0 text-amber-400 mt-0.5" />
-                  <span className="leading-snug">{activeStageData.visualHint}</span>
-                </div>
+
               </div>
 
               {/* Stage Stepper Progress Dots & Prev/Next Controls */}
@@ -1080,9 +1075,6 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
         ) : isCompleted ? (
           /* Completion Card */
           <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 shadow-xl text-center animate-in fade-in">
-            <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-emerald-500 flex items-center justify-center mx-auto mb-3 text-emerald-400 shadow-sm">
-              <Sparkles className="w-6 h-6" />
-            </div>
             <h3 className="text-xl font-black text-white mb-1">Simulasi Selesai!</h3>
             <p className="text-xs text-slate-300 mb-5 leading-relaxed">
               Respon tanggap darurat Anda untuk bencana {data.indonesianName} telah dievaluasi dengan baik.

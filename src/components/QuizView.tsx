@@ -212,26 +212,25 @@ export const QuizView: React.FC<QuizViewProps> = ({
           </div>
         </div>
 
-        {/* Category Topic Selector (Sleek Horizontal Pills) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-0.5 max-w-full">
-          {categories.map((cat) => {
-            const IconComp = cat.icon;
-            const isSelected = selectedDisaster === cat.id;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => handleSelectTopic(cat.id as any)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap flex items-center gap-1.5 transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-emerald-600 text-white border border-emerald-500 shadow-sm shadow-emerald-950'
-                    : 'bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 border border-zinc-800'
-                }`}
-              >
-                <IconComp className="w-3.5 h-3.5" />
-                <span>{cat.label}</span>
-              </button>
-            );
-          })}
+        {/* Category Topic Selector — Dropdown */}
+        <div className="relative">
+          <select
+            value={selectedDisaster}
+            onChange={(e) => handleSelectTopic(e.target.value as any)}
+            className="appearance-none bg-zinc-900 border border-zinc-700 text-white text-xs font-semibold rounded-lg px-4 py-2 pr-8 cursor-pointer focus:outline-none focus:border-emerald-500 transition-colors hover:border-zinc-500"
+          >
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.label}
+              </option>
+            ))}
+          </select>
+          {/* chevron icon */}
+          <div className="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-zinc-400">
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
         </div>
       </div>
 

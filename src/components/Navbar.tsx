@@ -9,7 +9,8 @@ import {
   Layers,
   Menu,
   X,
-  Home
+  Home,
+  HeartHandshake
 } from 'lucide-react';
 import { soundEngine } from '../audio/soundEngine';
 
@@ -111,6 +112,24 @@ export const Navbar: React.FC<NavbarProps> = ({
           }`}
         >
           <Award className="w-3.5 h-3.5" /> Kuis & Ujian
+        </button>
+
+        <button
+          onClick={() => handleNav('INCLUSIVE')}
+          className={`px-3 py-1 rounded-md text-xs font-semibold flex items-center gap-1.5 transition-all ${
+            currentView === 'INCLUSIVE' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+          }`}
+        >
+          <HeartHandshake className="w-3.5 h-3.5" /> Inklusif
+        </button>
+
+        <button
+          onClick={() => handleNav('FAQ')}
+          className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${
+            currentView === 'FAQ' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-300 hover:text-white hover:bg-zinc-800'
+          }`}
+        >
+          FAQ
         </button>
       </nav>
 
@@ -236,6 +255,24 @@ export const Navbar: React.FC<NavbarProps> = ({
               }`}
             >
               <Award className="w-4 h-4" /> Kuis & Ujian
+            </button>
+
+            <button
+              onClick={() => handleNav('INCLUSIVE')}
+              className={`min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors ${
+                currentView === 'INCLUSIVE' ? 'bg-emerald-600 text-white' : 'text-zinc-300 hover:text-white hover:bg-zinc-900 active:bg-zinc-800'
+              }`}
+            >
+              <HeartHandshake className="w-4 h-4 text-emerald-400" /> Mode Inklusif (Disabilitas)
+            </button>
+
+            <button
+              onClick={() => handleNav('FAQ')}
+              className={`min-h-[44px] px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-3 transition-colors ${
+                currentView === 'FAQ' ? 'bg-emerald-600 text-white' : 'text-zinc-300 hover:text-white hover:bg-zinc-900 active:bg-zinc-800'
+              }`}
+            >
+              FAQ
             </button>
           </div>
         </>

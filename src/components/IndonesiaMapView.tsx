@@ -26,18 +26,59 @@ interface IndonesiaMapViewProps {
   onNavigate?: (view: any) => void;
 }
 
-// Tile layers definitions for Google Maps view
+// Tile layers definitions for Google Maps view and OpenStreetMap fallback
 const TILE_LAYERS = {
   google_satellite: {
     name: 'Satelit Google Maps',
     url: 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-    attribution: '&copy; Google Maps Satellite Data'
+    attribution: '&copy; Google Maps Satellite Data',
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
   },
   google_terrain: {
     name: 'Google Maps Peta Jalan',
     url: 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}',
-    attribution: '&copy; Google Maps'
+    attribution: '&copy; Google Maps',
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+  },
+  osm: {
+    name: 'OpenStreetMap',
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; OpenStreetMap contributors',
+    subdomains: ['a', 'b', 'c']
   }
+};
+
+// Helper component to fix Leaflet size after page animation/transition
+const MapResizeFix: React.FC = () => {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 150);
+    const t2 = setTimeout(() => map.invalidateSize(), 450);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [map]);
+  return null;
+};
+
+// Helper component to deselect marker on map background click
+const MapClickHandler: React.FC<{ onDeselect: () => void }> = ({ onDeselect }) => {
+  const map = useMap();
+  useEffect(() => {
+    const handleMapClick = (e: any) => {
+      // Don't deselect if clicking a marker
+      if (!e.originalEvent?._stopped) {
+        onDeselect();
+      }
+    };
+    map.on('click', handleMapClick);
+    return () => {
+      map.off('click', handleMapClick);
+    };
+  }, [map, onDeselect]);
+  return null;
 };
 
 // Helper component to auto-recenter map when selecting a marker
@@ -103,7 +144,7 @@ const createCustomIcon = (type: string, isSelected: boolean) => {
 };
 
 export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
-  const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(INDONESIA_MAP_MARKERS[0]);
+  const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(null);
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'earthquake' | 'volcano' | 'subduction' | 'fault'>('ALL');
   const [selectedTileStyle, setSelectedTileStyle] = useState<keyof typeof TILE_LAYERS>('google_satellite');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -341,12 +382,23 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
               >
                 Peta Jalan
               </button>
+              <button
+                onClick={() => {
+                  soundEngine.playClick();
+                  setSelectedTileStyle('osm');
+                }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                  selectedTileStyle === 'osm' ? 'bg-emerald-600 text-white shadow-sm' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                OSM
+              </button>
             </div>
           </div>
         </div>
 
         {/* Map Viewport Area with Detail Floating Card */}
-        <div className="relative flex-1 w-full min-h-0 bg-black">
+        <div className="relative flex-1 w-full min-h-0 bg-slate-950">
           
           {/* Leaflet Map React Container */}
           <MapContainer
@@ -355,8 +407,15 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
             minZoom={4}
             maxZoom={14}
             className="w-full h-full z-0"
+            style={{ height: '100%', width: '100%', minHeight: '300px', backgroundColor: '#020617' }}
             zoomControl={true}
           >
+            {/* Auto-recalculate map dimensions on tab/page mount */}
+            <MapResizeFix />
+
+            {/* Click map background to dismiss selected detail */}
+            <MapClickHandler onDeselect={() => setSelectedMarker(null)} />
+
             {/* Auto Recenter to selected marker */}
             {selectedMarker && (
               <MapRecenter lat={selectedMarker.lat} lng={selectedMarker.lng} />
@@ -364,10 +423,11 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
 
             {/* Base Tile Layer */}
             <TileLayer
+              key={selectedTileStyle}
               url={TILE_LAYERS[selectedTileStyle].url}
               attribution={TILE_LAYERS[selectedTileStyle].attribution}
               maxZoom={20}
-              subdomains={['mt0', 'mt1', 'mt2', 'mt3']}
+              subdomains={TILE_LAYERS[selectedTileStyle].subdomains || ['a', 'b', 'c']}
             />
 
             {/* 1. SUNDA MEGATHRUST & TIMOR TRENCH POLYLINE (BLUE/CYAN) */}
@@ -419,7 +479,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
               </>
             )}
 
-            {/* 3. DISASTER MARKERS */}
+            {/* 3. DISASTER MARKERS (Single clean click handler without duplicate popup) */}
             {filteredMarkers.map((marker) => {
               const isSelected = selectedMarker?.id === marker.id;
               return (
@@ -433,15 +493,7 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
                       setSelectedMarker(marker);
                     }
                   }}
-                >
-                  <Popup className="custom-leaflet-popup">
-                    <div className="p-2 text-zinc-900">
-                      <div className="text-xs font-extrabold">{marker.title}</div>
-                      <div className="text-[11px] text-zinc-600 mb-1">{marker.location}</div>
-                      <div className="text-[10px] bg-zinc-100 p-1.5 rounded">{marker.description}</div>
-                    </div>
-                  </Popup>
-                </Marker>
+                />
               );
             })}
           </MapContainer>
@@ -533,3 +585,6 @@ export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
     </section>
   );
 };
+
+export default IndonesiaMapView;
+

@@ -63,3 +63,73 @@
 .high-contrast * {
   border-color: rgba(52, 211, 153, 0.5) !important;
 }
+
+/* ── Page Transition Animations ── */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes page-enter-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Stagger children: each direct child fades in with delay */
+@keyframes child-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.page-enter-scale {
+  animation: page-enter-scale 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger each direct child of a stagger container */
+.page-stagger > * {
+  animation: child-enter 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.page-stagger > *:nth-child(1)  { animation-delay: 0.05s; }
+.page-stagger > *:nth-child(2)  { animation-delay: 0.10s; }
+.page-stagger > *:nth-child(3)  { animation-delay: 0.15s; }
+.page-stagger > *:nth-child(4)  { animation-delay: 0.20s; }
+.page-stagger > *:nth-child(5)  { animation-delay: 0.25s; }
+.page-stagger > *:nth-child(6)  { animation-delay: 0.30s; }
+.page-stagger > *:nth-child(7)  { animation-delay: 0.35s; }
+.page-stagger > *:nth-child(8)  { animation-delay: 0.40s; }
+
+/* ── Leaflet Map Enhancements ── */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #030712 !important;
+  font-family: inherit !important;
+}
+
+/* Custom Marker Styling */
+.custom-leaflet-marker {
+  background: transparent !important;
+  border: none !important;
+}

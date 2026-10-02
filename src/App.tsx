@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { EruptionStage } from './scenes/VolcanoScene';
 import { TsunamiStage } from './scenes/TsunamiScene';
 import { FloodStage } from './scenes/FloodScene';
@@ -36,15 +36,28 @@ import { FloodScene } from './scenes/FloodScene';
 import { LandslideScene } from './scenes/LandslideScene';
 import { TornadoScene } from './scenes/TornadoScene';
 
-// UI Components & Full-Page Views
+// Always-visible shell components
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { DisasterDetailModal } from './components/DisasterDetailModal';
-import { SimulationOverlay } from './components/SimulationOverlay';
-import { AccessibilityModal } from './components/AccessibilityModal';
-import { IndonesiaMapView } from './components/IndonesiaMapView';
-import { EmergencyChecklistView } from './components/EmergencyChecklistView';
-import { QuizView } from './components/QuizView';
+import { PWAPrompt } from './components/PWAPrompt';
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+// ── Lazy-loaded views: downloaded only when user navigates to them ──
+const DisasterDetailModal    = lazy(() => import('./components/DisasterDetailModal').then(m => ({ default: m.DisasterDetailModal })));
+const SimulationOverlay      = lazy(() => import('./components/SimulationOverlay').then(m => ({ default: m.SimulationOverlay })));
+const AccessibilityModal     = lazy(() => import('./components/AccessibilityModal').then(m => ({ default: m.AccessibilityModal })));
+const IndonesiaMapView       = lazy(() => import('./components/IndonesiaMapView'));
+const EmergencyChecklistView = lazy(() => import('./components/EmergencyChecklistView').then(m => ({ default: m.EmergencyChecklistView })));
+const QuizView               = lazy(() => import('./components/QuizView').then(m => ({ default: m.QuizView })));
+const FaqView                = lazy(() => import('./components/FaqView').then(m => ({ default: m.FaqView })));
+const InclusiveModeView      = lazy(() => import('./components/InclusiveModeView'));
+
+// Minimal spinner shown while lazy chunks load
+const PageSpinner = () => (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#020617]">
+    <div className="w-8 h-8 border-2 border-zinc-700 border-t-emerald-500 rounded-full animate-spin" />
+  </div>
+);
 
 // Camera & Scene View Controller: ensures optimal viewpoints without clipping through walls
 const CameraController: React.FC<{ 
@@ -126,7 +139,7 @@ const CameraController: React.FC<{
 
 export const App: React.FC = () => {
   // Navigation & View State
-  const [currentView, setCurrentView] = useState<'HOME' | 'MODULES' | 'SIMULATION' | 'MAP' | 'CHECKLIST' | 'QUIZ'>('HOME');
+  const [currentView, setCurrentView] = useState<'HOME' | 'MODULES' | 'SIMULATION' | 'MAP' | 'CHECKLIST' | 'QUIZ' | 'FAQ' | 'INCLUSIVE'>('HOME');
   const [activeDisaster, setActiveDisaster] = useState<DisasterId>('EARTHQUAKE');
   const [isSimulating, setIsSimulating] = useState(true);
   const [volcanoStage, setVolcanoStage] = useState<EruptionStage>(0);
@@ -225,6 +238,9 @@ export const App: React.FC = () => {
   };
 
   return (
+    <Suspense fallback={<PageSpinner />}>
+    {/* PWA: install banner, offline badge, update toast */}
+    <PWAPrompt />
     <div className={`flex flex-col bg-[#020617] text-slate-100 relative ${
       currentView === 'HOME' ? 'h-screen max-h-screen overflow-hidden' : 'min-h-screen'
     } ${
@@ -236,11 +252,19 @@ export const App: React.FC = () => {
         currentView={currentView}
         onNavigate={(view) => {
           soundEngine.playClick();
+          setSelectedDisasterForDetail(null);
+          setShowAccessibilityModal(false);
+          if (view === 'HOME') {
+            setIsSimulating(false);
+          }
           setCurrentView(view as any);
         }}
         soundEnabled={soundEnabled}
         onToggleSound={() => setSoundEnabled(!soundEnabled)}
-        onOpenAccessibility={() => setShowAccessibilityModal(true)}
+        onOpenAccessibility={() => {
+          setSelectedDisasterForDetail(null);
+          setShowAccessibilityModal(true);
+        }}
         userXp={userXp}
       />
 
@@ -386,7 +410,7 @@ export const App: React.FC = () => {
 
       {/* Hero UI Layer for HOME View (Single-Screen 100% Non-Scrolling Layout) */}
       {currentView === 'HOME' && (
-        <main className="relative z-10 flex-1 flex flex-col justify-between h-[100dvh] pt-16 sm:pt-20 pb-3 px-3 sm:px-6 pointer-events-none">
+        <main key="home" className="page-enter-scale relative z-10 flex-1 flex flex-col justify-between h-[100dvh] pt-16 sm:pt-20 pb-3 px-3 sm:px-6 pointer-events-none">
           {/* Top/Center Hero Typography */}
           <div className="max-w-3xl mx-auto text-center pointer-events-auto my-auto py-2 sm:py-4">
             {/* Main Hero Typography */}
@@ -496,7 +520,7 @@ export const App: React.FC = () => {
 
       {/* Grid of 6 Disaster Cards exclusively on MODULES View */}
       {currentView === 'MODULES' && (
-        <section id="modul-bencana" className="relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 w-full flex-1 animate-in fade-in duration-300">
+        <section key="modules" id="modul-bencana" className="page-enter relative z-20 max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-24 pb-12 w-full flex-1">
           <div className="mb-6">
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-zinc-900 border border-emerald-600 text-emerald-400 text-xs font-bold mb-2">
               <Layers className="w-3 h-3" />
@@ -506,7 +530,7 @@ export const App: React.FC = () => {
             <p className="text-xs text-zinc-400 mt-1">Pilih modul untuk mempelajari sains di balik bencana dan menguji kesiapan mitigasi Anda</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 page-stagger">
             {disasterList.map((id) => {
               const data = DISASTERS_DATA[id];
               return (
@@ -575,24 +599,49 @@ export const App: React.FC = () => {
 
       {/* Full-Page Interactive Map Portal */}
       {currentView === 'MAP' && (
-        <IndonesiaMapView onNavigate={(view) => setCurrentView(view)} />
+        <div key="map" className="page-enter w-full h-[100dvh]">
+          <ErrorBoundary fallbackMessage="Peta interaktif sedang memuat modul geospasial.">
+            <IndonesiaMapView onNavigate={(view) => setCurrentView(view)} />
+          </ErrorBoundary>
+        </div>
       )}
 
       {/* Full-Page Emergency Survival Kit Checklist */}
       {currentView === 'CHECKLIST' && (
-        <EmergencyChecklistView onNavigate={(view) => setCurrentView(view)} />
+        <div key="checklist" className="page-enter">
+          <EmergencyChecklistView onNavigate={(view) => setCurrentView(view)} />
+        </div>
       )}
 
       {/* Full-Page Gamified Quiz & Evaluation Arena */}
       {currentView === 'QUIZ' && (
-        <QuizView 
-          initialDisasterId={quizDisasterFilter}
-          onNavigate={(view) => setCurrentView(view)}
-          onAddXp={addXp}
-        />
+        <div key="quiz" className="page-enter">
+          <QuizView 
+            initialDisasterId={quizDisasterFilter}
+            onNavigate={(view) => setCurrentView(view)}
+            onAddXp={addXp}
+          />
+        </div>
       )}
 
-      {/* Educational Accreditation Footer (For scrollable views like MODULES, CHECKLIST) */}
+      {/* FAQ Page */}
+      {currentView === 'FAQ' && (
+        <div key="faq" className="page-enter">
+          <FaqView onNavigate={(view) => setCurrentView(view as any)} />
+        </div>
+      )}
+
+      {/* Mode Inklusif: Panduan Siswa Disabilitas */}
+      {currentView === 'INCLUSIVE' && (
+        <div key="inclusive" className="page-enter">
+          <InclusiveModeView 
+            onNavigate={(view) => setCurrentView(view as any)} 
+            onStartSimulation={(id) => handleStartSimulation(id)}
+          />
+        </div>
+      )}
+
+      {/* Educational Accreditation Footer (For scrollable views like MODULES, CHECKLIST, INCLUSIVE, FAQ) */}
       {currentView !== 'SIMULATION' && currentView !== 'HOME' && currentView !== 'MAP' && currentView !== 'QUIZ' && (
         <Footer 
           onSelectDisaster={(id) => setSelectedDisasterForDetail(id)}
@@ -622,10 +671,12 @@ export const App: React.FC = () => {
           onToggleReducedMotion={() => setReducedMotion(!reducedMotion)}
           voiceNarrationEnabled={voiceNarrationEnabled}
           onToggleVoiceNarration={() => setVoiceNarrationEnabled(!voiceNarrationEnabled)}
+          onOpenInclusiveMode={() => setCurrentView('INCLUSIVE')}
         />
       )}
 
     </div>
+    </Suspense>
   );
 };
 

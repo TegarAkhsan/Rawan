@@ -5,7 +5,9 @@ import {
   Volume2, 
   Type, 
   Sliders, 
-  Check 
+  Check,
+  HeartHandshake,
+  ArrowRight
 } from 'lucide-react';
 import { soundEngine } from '../audio/soundEngine';
 
@@ -19,6 +21,7 @@ interface AccessibilityModalProps {
   onToggleReducedMotion: () => void;
   voiceNarrationEnabled: boolean;
   onToggleVoiceNarration: () => void;
+  onOpenInclusiveMode?: () => void;
 }
 
 export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
@@ -30,7 +33,8 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
   reducedMotion,
   onToggleReducedMotion,
   voiceNarrationEnabled,
-  onToggleVoiceNarration
+  onToggleVoiceNarration,
+  onOpenInclusiveMode
 }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
@@ -162,6 +166,32 @@ export const AccessibilityModal: React.FC<AccessibilityModalProps> = ({
               }`} />
             </div>
           </div>
+
+          {/* Mode Inklusif Quick Navigation Banner */}
+          {onOpenInclusiveMode && (
+            <div 
+              onClick={() => {
+                soundEngine.playClick();
+                onClose();
+                onOpenInclusiveMode();
+              }}
+              className="p-4 rounded-2xl bg-gradient-to-r from-emerald-950/60 via-zinc-900 to-sky-950/60 border border-emerald-500/40 flex items-center justify-between cursor-pointer hover:border-emerald-400 transition-all group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/50 flex items-center justify-center text-emerald-400 shrink-0">
+                  <HeartHandshake className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>Mode Inklusif (Disabilitas)</span>
+                    <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold uppercase">Baru</span>
+                  </div>
+                  <div className="text-[11px] text-zinc-400">Panduan evakuasi Tuli, Netra & Kursi Roda</div>
+                </div>
+              </div>
+              <ArrowRight className="w-4 h-4 text-emerald-400 group-hover:translate-x-1 transition-transform" />
+            </div>
+          )}
         </div>
 
         {/* Done Button */}
