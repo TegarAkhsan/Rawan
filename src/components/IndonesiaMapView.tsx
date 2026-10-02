@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   MapPin, 
   Flame, 
@@ -99,13 +99,23 @@ const createCustomIcon = (type: string, isSelected: boolean) => {
 
 export const IndonesiaMapView: React.FC<IndonesiaMapViewProps> = () => {
   const { language, t } = useLanguage();
-  const staticMarkers = getMapMarkers(language);
+  const staticMarkers = useMemo(() => getMapMarkers(language), [language]);
   const [selectedMarker, setSelectedMarker] = useState<MapMarker | null>(staticMarkers[0]);
   const [activeFilter, setActiveFilter] = useState<'ALL' | 'earthquake' | 'volcano' | 'subduction' | 'fault'>('ALL');
   const [selectedTileStyle, setSelectedTileStyle] = useState<keyof typeof TILE_LAYERS>('google_satellite');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [bmkgLiveMarkers, setBmkgLiveMarkers] = useState<MapMarker[]>([]);
   const [lastBmkgSync, setLastBmkgSync] = useState<string>('');
+
+  // Keep selectedMarker in sync with language switch
+  useEffect(() => {
+    if (selectedMarker) {
+      const updated = staticMarkers.find(m => m.id === selectedMarker.id);
+      if (updated) {
+        setSelectedMarker(updated);
+      }
+    }
+  }, [language, staticMarkers]);
 
   // Tectonic Trench Lines for Real Leaflet Overlay (PUSGEN BMKG Data)
   const sundaMegathrustCoords: [number, number][] = [
