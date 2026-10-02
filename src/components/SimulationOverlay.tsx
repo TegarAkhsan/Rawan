@@ -239,17 +239,13 @@ export const SimulationOverlay: React.FC<SimulationOverlayProps> = ({
         </div>
 
         {/* Hazard Level Badge (Perfect Center Alignment on Viewport) */}
-        <div className="static md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-xl bg-zinc-950/90 border border-zinc-800 backdrop-blur-md shadow-md z-0 whitespace-nowrap">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: activeStageData ? activeStageData.pvmbgColor : data.color }} />
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
-              STATUS: <span style={{ color: activeStageData ? activeStageData.pvmbgColor : data.color }}>
-                {activeStageData ? activeStageData.pvmbgLevel : scenario.hazardLevel}
-              </span>
+        <div className="static md:absolute md:left-1/2 md:-translate-x-1/2 flex items-center gap-1.5 px-3 py-1 rounded-xl bg-zinc-950/90 border border-zinc-800 backdrop-blur-md shadow-md z-0 whitespace-nowrap">
+          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: activeStageData ? activeStageData.pvmbgColor : data.color }} />
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-zinc-400">
+            STATUS: <span style={{ color: activeStageData ? activeStageData.pvmbgColor : data.color }}>
+              {activeStageData ? activeStageData.pvmbgLevel : scenario.hazardLevel}
             </span>
-          </div>
-          <span className="text-zinc-700">|</span>
-          <span className="text-[11px] font-bold text-white hidden sm:inline">{scenario.environmentName}</span>
+          </span>
         </div>
 
         {/* Simulation Controls (Right) */}
